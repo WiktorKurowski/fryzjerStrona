@@ -1653,9 +1653,19 @@
           ? window.KUROWSKA_DATA.services
           : [];
 
-        const defaultReviews = Array.isArray(window.KUROWSKA_DATA?.reviews) && window.KUROWSKA_DATA.reviews.length
-          ? window.KUROWSKA_DATA.reviews
-          : [];
+        function dedupeReviews(list) {
+          const seen = new Set();
+          return (Array.isArray(list) ? list : []).filter((review) => {
+            if (!review || typeof review !== 'object') return false;
+            const key = review.id !== undefined && review.id !== null
+              ? `id:${String(review.id)}`
+              : `review:${String(review.email || '').trim().toLowerCase()}|${String(review.message || '').trim()}`;
+
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+        }
 
         function getServices() {
           try {
@@ -2313,15 +2323,15 @@
               createdAt: new Date().toISOString()
             };
 
-            const reviews = getReviews();
+            const reviews = dedupeReviews(getReviews());
             const blocked = isBlockedReview(newReview);
 
             if (blocked) {
               newReview.hidden = true;
               newReview.status = 'blocked';
-              reviews.unshift(newReview);
+              const nextReviews = dedupeReviews([newReview, ...reviews]);
               try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(nextReviews));
               } catch (error) {
                 console.error(error);
               }
@@ -2331,10 +2341,10 @@
               return;
             }
 
-            reviews.unshift(newReview);
+            const nextReviews = dedupeReviews([newReview, ...reviews]);
 
             try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(nextReviews));
             } catch (error) {
               console.error(error);
               alert('Nie udało się zapisać opinii. Spróbuj ponownie.');
