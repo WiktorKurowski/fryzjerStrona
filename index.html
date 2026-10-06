@@ -163,6 +163,30 @@
         to { opacity: 1; transform: translateY(0); }
       }
 
+      @keyframes imageReveal {
+        from {
+          opacity: 0;
+          transform: translateY(26px) scale(1.03);
+          filter: blur(2px) saturate(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0) saturate(1);
+        }
+      }
+
+      @keyframes revealUp {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .hero-content {
         position: relative;
         z-index: 1;
@@ -195,6 +219,37 @@
         font-size: 1.06rem;
         color: rgba(255, 255, 255, 0.85);
         margin-bottom: 28px;
+      }
+
+      .hero-holiday {
+        display: none;
+        max-width: 560px;
+        margin: 0 0 22px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+      }
+
+      .hero-holiday.visible {
+        display: block;
+      }
+
+      .hero-holiday strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f2d9a8;
+      }
+
+      .hero-holiday span {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.02rem;
       }
 
       .hero-actions {
@@ -276,6 +331,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        animation: imageReveal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
       }
 
       .about-content h3 {
@@ -288,6 +344,16 @@
         color: var(--muted);
         margin-bottom: 18px;
         font-size: 1.02rem;
+      }
+
+      .about-holiday-note {
+        margin-top: 18px;
+        background: linear-gradient(135deg, rgba(195, 154, 77, 0.12), rgba(141, 107, 46, 0.04));
+        border: 1px solid rgba(195, 154, 77, 0.28);
+        border-radius: 16px;
+        padding: 14px 16px;
+        color: var(--text);
+        font-weight: 600;
       }
 
       .features {
@@ -560,10 +626,27 @@
         height: 100%;
         object-fit: cover;
         transition: transform 0.35s ease;
+        animation: imageReveal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
       }
+
+      .gallery-item:nth-child(2) img { animation-delay: 0.08s; }
+      .gallery-item:nth-child(3) img { animation-delay: 0.16s; }
+      .gallery-item:nth-child(4) img { animation-delay: 0.24s; }
 
       .gallery-item:hover img {
         transform: scale(1.05);
+      }
+
+      .reveal-element {
+        opacity: 0;
+        transform: translateY(32px);
+        transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+        will-change: transform, opacity;
+      }
+
+      .reveal-element.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       .gallery-label {
@@ -852,6 +935,33 @@
         color: var(--muted);
       }
 
+      .holiday-banner {
+        display: none;
+        background: linear-gradient(135deg, rgba(195, 154, 77, 0.15), rgba(141, 107, 46, 0.08));
+        border: 1px solid rgba(195, 154, 77, 0.45);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+      }
+
+      .holiday-banner.visible {
+        display: block;
+      }
+
+      .holiday-banner strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--secondary-strong);
+      }
+
+      .holiday-banner p {
+        margin: 0;
+        color: var(--text);
+      }
+
       .hours-list {
         list-style: none;
         padding: 0;
@@ -1001,6 +1111,7 @@
             Profesjonalna opieka nad włosami w komfortowych warunkach. Tworzymy fryzury dopasowane do Ciebie,
             Twojego stylu życia i codziennych potrzeb, z naciskiem na naturalny efekt i estetykę.
           </p>
+          <div id="heroHoliday" class="hero-holiday" aria-live="polite"></div>
           <div class="hero-actions">
             <a class="btn" href="#uslugi">Zobacz cennik</a>
             <a class="btn btn-light" href="#kontakt">Skontaktuj się</a>
@@ -1046,6 +1157,10 @@
                 Oferujemy strzyżenie, koloryzację, stylizację oraz pielęgnację, a nasza praca opiera się na nowoczesnych
                 technikach, doświadczeniu i trosce o zdrowie włosów.
               </p>
+
+              <div class="about-holiday-note">
+                W wakacje i podczas krótkich przerw sezonowych dbamy też o odpoczynek — wtedy aktualizujemy grafik i informujemy klientów o dokładnym terminie powrotu do pracy.
+              </div>
 
               <div class="features">
                 <div class="feature">
@@ -1260,6 +1375,7 @@
 
             <div class="hours-card">
               <h3>Godziny otwarcia</h3>
+              <div id="holidayBanner" class="holiday-banner" aria-live="polite"></div>
               <ul class="hours-list">
                 <li><span>Poniedziałek</span><span>9:00 - 20:00</span></li>
                 <li><span>Wtorek</span><span>9:00 - 20:00</span></li>
@@ -1286,6 +1402,22 @@
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const HOURS_KEY = 'kurowska_pracownia_godziny';
+        const HOLIDAY_KEY = 'kurowska_pracownia_wakacje';
+        const defaultHolidaySettings = {
+          active: false,
+          until: '',
+          message: 'Jestem na wakacjach. Wracam do pracy {date}.'
+        };
+        const defaultOpeningHours = [
+          { day: 'Poniedziałek', value: '9:00 - 20:00' },
+          { day: 'Wtorek', value: '9:00 - 20:00' },
+          { day: 'Środa', value: '9:00 - 20:00' },
+          { day: 'Czwartek', value: '9:00 - 20:00' },
+          { day: 'Piątek', value: '9:00 - 20:00' },
+          { day: 'Sobota', value: 'Brak' },
+          { day: 'Niedziela', value: 'Brak' }
+        ];
         const bannedTerms = [
           'chuj', 'chuja', 'chujek', 'chujem', 'chujnia', 'kurwa', 'kurew', 'kurewski', 'dupa', 'dupka',
           'pizda', 'pizdy', 'pierdol', 'pierdolec', 'jebac', 'jebie', 'jeba', 'cipa', 'cipka',
@@ -1409,6 +1541,143 @@
           }
         }
 
+        function getOpeningHours() {
+          try {
+            const raw = localStorage.getItem(HOURS_KEY);
+            if (!raw) {
+              localStorage.setItem(HOURS_KEY, JSON.stringify(defaultOpeningHours));
+              return [...defaultOpeningHours];
+            }
+
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed) || !parsed.length) {
+              localStorage.setItem(HOURS_KEY, JSON.stringify(defaultOpeningHours));
+              return [...defaultOpeningHours];
+            }
+
+            return parsed.map((entry) => ({
+              day: entry.day || 'Dzień',
+              value: entry.value || 'Brak'
+            }));
+          } catch (error) {
+            return [...defaultOpeningHours];
+          }
+        }
+
+        function getHolidaySettings() {
+          try {
+            const raw = localStorage.getItem(HOLIDAY_KEY);
+            if (!raw) {
+              localStorage.setItem(HOLIDAY_KEY, JSON.stringify(defaultHolidaySettings));
+              return { ...defaultHolidaySettings };
+            }
+
+            const parsed = JSON.parse(raw);
+            return {
+              active: Boolean(parsed.active),
+              until: String(parsed.until || '').trim(),
+              message: String(parsed.message || '').trim() || defaultHolidaySettings.message
+            };
+          } catch (error) {
+            return { ...defaultHolidaySettings };
+          }
+        }
+
+        function formatHolidayDate(value) {
+          if (!value) return 'wkrótce';
+          const date = new Date(`${value}T00:00:00`);
+          if (Number.isNaN(date.getTime())) return value;
+          return date.toLocaleDateString('pl-PL', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        }
+
+        function renderHolidayBanner() {
+          const banner = document.getElementById('holidayBanner');
+          if (!banner) return;
+
+          const settings = getHolidaySettings();
+          if (!settings.active) {
+            banner.classList.remove('visible');
+            banner.innerHTML = '';
+            return;
+          }
+
+          const returnDate = formatHolidayDate(settings.until);
+          const message = (settings.message || defaultHolidaySettings.message)
+            .replace('{date}', returnDate)
+            .replace('{date}', returnDate);
+
+          banner.classList.add('visible');
+          banner.innerHTML = `
+            <strong>Na wakacjach</strong>
+            <p>${message}</p>
+          `;
+        }
+
+        function renderHolidayHero() {
+          const heroHoliday = document.getElementById('heroHoliday');
+          if (!heroHoliday) return;
+
+          const settings = getHolidaySettings();
+          if (!settings.active) {
+            heroHoliday.classList.remove('visible');
+            heroHoliday.innerHTML = '';
+            return;
+          }
+
+          const returnDate = formatHolidayDate(settings.until);
+          const message = (settings.message || defaultHolidaySettings.message)
+            .replace('{date}', returnDate)
+            .replace('{date}', returnDate);
+
+          heroHoliday.classList.add('visible');
+          heroHoliday.innerHTML = `
+            <strong>Na wakacjach</strong>
+            <span>${message}</span>
+          `;
+        }
+
+        function renderOpeningHours() {
+          const list = document.querySelector('.hours-list');
+          if (!list) return;
+
+          const settings = getHolidaySettings();
+          if (settings.active) {
+            const returnDate = formatHolidayDate(settings.until);
+            const message = (settings.message || defaultHolidaySettings.message)
+              .replace('{date}', returnDate)
+              .replace('{date}', returnDate);
+
+            list.innerHTML = `
+              <li><span>Na wakacjach</span><span>${message}</span></li>
+            `;
+            renderHolidayBanner();
+            renderHolidayHero();
+            return;
+          }
+
+          const hours = getOpeningHours();
+          list.innerHTML = hours.map((entry) => `
+            <li><span>${entry.day}</span><span>${entry.value}</span></li>
+          `).join('');
+
+          renderHolidayBanner();
+          renderHolidayHero();
+        }
+
+        window.addEventListener('storage', function (event) {
+          if (event.key === HOLIDAY_KEY || event.key === HOURS_KEY) {
+            renderOpeningHours();
+          }
+        });
+
+        window.addEventListener('kurowska-settings-updated', function () {
+          renderOpeningHours();
+        });
+
         function isPositiveReviewText(value) {
           const text = normalizeText(value || '');
           if (!text) return false;
@@ -1493,6 +1762,31 @@
 
             requestAnimationFrame(update);
           }, delay);
+        }
+
+        function setupRevealAnimations() {
+          const targets = document.querySelectorAll(
+            '.section, .section-heading, .about-grid, .feature, .process-step, .price-item, .gallery-item, .gallery-card, .review-item, .contact-card, .hours-card, .about-photo, .summary-card, .faq-item'
+          );
+
+          targets.forEach((element, index) => {
+            element.classList.add('reveal-element');
+            element.style.transitionDelay = `${Math.min(index * 80, 420)}ms`;
+          });
+
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, {
+            threshold: 0.12,
+            rootMargin: '0px 0px -5% 0px'
+          });
+
+          document.querySelectorAll('.reveal-element').forEach((element) => observer.observe(element));
         }
 
         function renderReviews() {
@@ -1677,7 +1971,9 @@
         }
 
         renderServices();
+        renderOpeningHours();
         renderReviews();
+        setupRevealAnimations();
       })();
     </script>
   </body>

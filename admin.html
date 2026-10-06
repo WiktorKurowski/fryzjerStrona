@@ -204,6 +204,53 @@
         color: #7d3027;
       }
 
+      .hours-editor-grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .hours-editor-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .hours-editor-row label {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .hours-editor-row input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .holiday-editor {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .holiday-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .holiday-toggle input {
+        width: 18px;
+        height: 18px;
+      }
+
       .review-table th {
         font-size: 0.8rem;
         text-transform: uppercase;
@@ -317,6 +364,28 @@
               </section>
 
               <section class="admin-block">
+                <h2>Godziny otwarcia</h2>
+                <div id="hoursEditor" class="hours-editor-grid"></div>
+                <button type="button" class="btn save-pricing-btn" id="saveHoursBtn">Zapisz godziny</button>
+              </section>
+
+              <section class="admin-block">
+                <h2>Wakacje</h2>
+                <div class="holiday-editor">
+                  <label class="holiday-toggle">
+                    <input type="checkbox" id="holidayActive" />
+                    <span>Włącz wakacje</span>
+                  </label>
+
+                  <div class="input-grid">
+                    <input type="date" id="holidayUntil" />
+                    <input type="text" id="holidayMessage" placeholder="Jestem na wakacjach. Wracam do pracy {date}." />
+                  </div>
+                </div>
+                <button type="button" class="btn save-pricing-btn" id="saveHolidayBtn">Zapisz wakacje</button>
+              </section>
+
+              <section class="admin-block">
                 <h2>Opinie klientów</h2>
                 <table class="review-table">
                   <thead>
@@ -342,8 +411,26 @@
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const HOURS_KEY = 'kurowska_pracownia_godziny';
+        const HOLIDAY_KEY = 'kurowska_pracownia_wakacje';
         const ADMIN_LOGIN = 'admin';
         const ADMIN_PASSWORD = 'kurowska2025';
+
+        const defaultHolidaySettings = {
+          active: false,
+          until: '',
+          message: 'Jestem na wakacjach. Wracam do pracy {date}.'
+        };
+
+        const defaultOpeningHours = [
+          { day: 'Poniedziałek', value: '9:00 - 20:00' },
+          { day: 'Wtorek', value: '9:00 - 20:00' },
+          { day: 'Środa', value: '9:00 - 20:00' },
+          { day: 'Czwartek', value: '9:00 - 20:00' },
+          { day: 'Piątek', value: '9:00 - 20:00' },
+          { day: 'Sobota', value: 'Brak' },
+          { day: 'Niedziela', value: 'Brak' }
+        ];
 
         const defaultServices = [
           {
@@ -454,6 +541,103 @@
           } catch (error) {
             return [...defaultServices];
           }
+        }
+
+        function getOpeningHours() {
+          try {
+            const raw = localStorage.getItem(HOURS_KEY);
+            if (!raw) {
+              localStorage.setItem(HOURS_KEY, JSON.stringify(defaultOpeningHours));
+              return [...defaultOpeningHours];
+            }
+
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed) || !parsed.length) {
+              localStorage.setItem(HOURS_KEY, JSON.stringify(defaultOpeningHours));
+              return [...defaultOpeningHours];
+            }
+
+            return parsed.map((entry) => ({
+              day: entry.day || 'Dzień',
+              value: entry.value || 'Brak'
+            }));
+          } catch (error) {
+            return [...defaultOpeningHours];
+          }
+        }
+
+        function getHolidaySettings() {
+          try {
+            const raw = localStorage.getItem(HOLIDAY_KEY);
+            if (!raw) {
+              localStorage.setItem(HOLIDAY_KEY, JSON.stringify(defaultHolidaySettings));
+              return { ...defaultHolidaySettings };
+            }
+
+            const parsed = JSON.parse(raw);
+            return {
+              active: Boolean(parsed.active),
+              until: String(parsed.until || '').trim(),
+              message: String(parsed.message || '').trim() || defaultHolidaySettings.message
+            };
+          } catch (error) {
+            return { ...defaultHolidaySettings };
+          }
+        }
+
+        function renderHoursEditor() {
+          const container = document.getElementById('hoursEditor');
+          if (!container) return;
+
+          const hours = getOpeningHours();
+          container.innerHTML = hours.map((entry) => `
+            <div class="hours-editor-row">
+              <label for="hours-${entry.day}">${entry.day}</label>
+              <input id="hours-${entry.day}" data-day="${entry.day}" value="${(entry.value || '').replace(/"/g, '&quot;')}" />
+            </div>
+          `).join('');
+        }
+
+        function renderHolidayEditor() {
+          const activeInput = document.getElementById('holidayActive');
+          const untilInput = document.getElementById('holidayUntil');
+          const messageInput = document.getElementById('holidayMessage');
+          if (!activeInput || !untilInput || !messageInput) return;
+
+          const settings = getHolidaySettings();
+          activeInput.checked = Boolean(settings.active);
+          untilInput.value = settings.until || '';
+          messageInput.value = settings.message || defaultHolidaySettings.message;
+        }
+
+        function saveOpeningHours() {
+          const inputs = document.querySelectorAll('#hoursEditor input');
+          const nextHours = Array.from(inputs).map((input) => ({
+            day: input.dataset.day || input.id.replace('hours-', ''),
+            value: input.value.trim() || 'Brak'
+          }));
+
+          localStorage.setItem(HOURS_KEY, JSON.stringify(nextHours));
+          window.dispatchEvent(new Event('kurowska-settings-updated'));
+          alert('Zapisano godziny otwarcia.');
+        }
+
+        function saveHolidaySettings() {
+          const activeInput = document.getElementById('holidayActive');
+          const untilInput = document.getElementById('holidayUntil');
+          const messageInput = document.getElementById('holidayMessage');
+
+          if (!activeInput || !untilInput || !messageInput) return;
+
+          const nextSettings = {
+            active: activeInput.checked,
+            until: untilInput.value,
+            message: messageInput.value.trim() || defaultHolidaySettings.message
+          };
+
+          localStorage.setItem(HOLIDAY_KEY, JSON.stringify(nextSettings));
+          window.dispatchEvent(new Event('kurowska-settings-updated'));
+          alert('Zapisano ustawienia wakacji.');
         }
 
         function isLoggedIn() {
@@ -594,6 +778,8 @@
             adminArea.classList.add('visible');
             logoutBtn.style.display = 'inline-block';
             renderServiceEditor();
+            renderHoursEditor();
+            renderHolidayEditor();
             renderReviews();
           } else {
             loginError.classList.add('visible');
@@ -616,12 +802,16 @@
 
         logoutBtn.addEventListener('click', logout);
         document.getElementById('savePricingBtn').addEventListener('click', saveServices);
+        document.getElementById('saveHoursBtn').addEventListener('click', saveOpeningHours);
+        document.getElementById('saveHolidayBtn').addEventListener('click', saveHolidaySettings);
 
         if (isLoggedIn()) {
           loginBox.style.display = 'none';
           adminArea.classList.add('visible');
           logoutBtn.style.display = 'inline-block';
           renderServiceEditor();
+          renderHoursEditor();
+          renderHolidayEditor();
           renderReviews();
         }
       })();

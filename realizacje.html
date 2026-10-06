@@ -159,7 +159,21 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        animation: imageReveal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+      }
+
+      @keyframes imageReveal {
+        from {
+          opacity: 0;
+          transform: translateY(26px) scale(1.03);
+          filter: blur(2px) saturate(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0) saturate(1);
+        }
       }
 
       .comparison-after {
