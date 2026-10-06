@@ -170,10 +170,18 @@
         margin-top: 18px;
       }
 
+      .review-table-wrap {
+        max-height: 420px;
+        overflow-y: auto;
+        margin-top: 22px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+      }
+
       .review-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 22px;
       }
 
       .review-table th,
@@ -475,19 +483,21 @@
 
               <section class="admin-block">
                 <h2>Opinie klientów</h2>
-                <table class="review-table">
-                  <thead>
-                    <tr>
-                      <th>Autor</th>
-                      <th>Opinia</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Data</th>
-                      <th>Akcja</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminReviews"></tbody>
-                </table>
+                <div class="review-table-wrap">
+                  <table class="review-table">
+                    <thead>
+                      <tr>
+                        <th>Autor</th>
+                        <th>Opinia</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Akcja</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminReviews"></tbody>
+                  </table>
+                </div>
               </section>
             </div>
           </div>
