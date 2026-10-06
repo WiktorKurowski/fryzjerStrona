@@ -986,6 +986,99 @@
         font-weight: 700;
       }
 
+      .availability-wrap {
+        margin-top: 20px;
+      }
+
+      .availability-title {
+        margin: 0 0 12px;
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--secondary-strong);
+        font-weight: 800;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .calendar-day {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248, 244, 239, 0.85));
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 116px;
+      }
+
+      .calendar-day.is-closed {
+        background: linear-gradient(180deg, rgba(122, 92, 80, 0.08), rgba(122, 92, 80, 0.03));
+        border-color: rgba(122, 92, 80, 0.18);
+      }
+
+      .calendar-day.is-holiday {
+        background: linear-gradient(180deg, rgba(195, 154, 77, 0.12), rgba(141, 107, 46, 0.05));
+        border-color: rgba(195, 154, 77, 0.25);
+      }
+
+      .calendar-day.is-booked {
+        background: linear-gradient(180deg, rgba(181, 96, 72, 0.09), rgba(181, 96, 72, 0.04));
+        border-color: rgba(181, 96, 72, 0.2);
+      }
+
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .calendar-day strong {
+        font-size: 1.15rem;
+      }
+
+      .calendar-day small {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .calendar-badge {
+        display: inline-block;
+        font-size: 0.66rem;
+        font-weight: 700;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: rgba(41, 150, 97, 0.12);
+        color: #1d6a45;
+      }
+
+      .calendar-day.is-closed .calendar-badge {
+        background: rgba(183, 77, 61, 0.12);
+        color: #7d3027;
+      }
+
+      .calendar-day.is-holiday .calendar-badge {
+        background: rgba(195, 154, 77, 0.18);
+        color: var(--secondary-strong);
+      }
+
+      .calendar-day.is-booked .calendar-badge {
+        background: rgba(181, 96, 72, 0.12);
+        color: #8a4f3e;
+      }
+
+      .calendar-hours {
+        font-size: 0.77rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
       footer {
         background: #1d1a1a;
         color: #fff;
@@ -1385,6 +1478,11 @@
                 <li><span>Sobota</span><span>Brak</span></li>
                 <li><span>Niedziela</span><span>Brak</span></li>
               </ul>
+
+              <div class="availability-wrap">
+                <p class="availability-title">Kalendarz dostępności</p>
+                <div id="availabilityCalendar" class="calendar-grid"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1398,14 +1496,24 @@
     </footer>
 
     <script src="data.js"></script>
+    <script src="data-layer.js"></script>
     <script>
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
         const HOURS_KEY = 'kurowska_pracownia_godziny';
         const HOLIDAY_KEY = 'kurowska_pracownia_wakacje';
+        const APPOINTMENTS_KEY = 'kurowska_pracownia_wizyty';
+        const storage = window.KUROWSKA_STORAGE || {
+          getReviews: () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'),
+          getServices: () => JSON.parse(localStorage.getItem(SERVICES_KEY) || '[]'),
+          getOpeningHours: () => JSON.parse(localStorage.getItem(HOURS_KEY) || '[]'),
+          getHolidaySettings: () => JSON.parse(localStorage.getItem(HOLIDAY_KEY) || '{"active":false,"from":"","until":"","message":"Jestem na wakacjach. Wracam do pracy {date}."}'),
+          getAppointments: () => JSON.parse(localStorage.getItem(APPOINTMENTS_KEY) || '[]')
+        };
         const defaultHolidaySettings = {
           active: false,
+          from: '',
           until: '',
           message: 'Jestem na wakacjach. Wracam do pracy {date}.'
         };
@@ -1566,6 +1674,16 @@
 
         function getHolidaySettings() {
           try {
+            if (storage.getHolidaySettings && typeof storage.getHolidaySettings === 'function') {
+              const settings = storage.getHolidaySettings();
+              return {
+                active: Boolean(settings && settings.active),
+                from: String(settings && settings.from ? settings.from : '').trim(),
+                until: String(settings && settings.until ? settings.until : '').trim(),
+                message: String(settings && settings.message ? settings.message : '').trim() || defaultHolidaySettings.message
+              };
+            }
+
             const raw = localStorage.getItem(HOLIDAY_KEY);
             if (!raw) {
               localStorage.setItem(HOLIDAY_KEY, JSON.stringify(defaultHolidaySettings));
@@ -1575,12 +1693,67 @@
             const parsed = JSON.parse(raw);
             return {
               active: Boolean(parsed.active),
+              from: String(parsed.from || '').trim(),
               until: String(parsed.until || '').trim(),
               message: String(parsed.message || '').trim() || defaultHolidaySettings.message
             };
           } catch (error) {
             return { ...defaultHolidaySettings };
           }
+        }
+
+        function getAppointments() {
+          try {
+            if (storage.getAppointments && typeof storage.getAppointments === 'function') {
+              const list = storage.getAppointments();
+              return Array.isArray(list) ? list : [];
+            }
+
+            const raw = localStorage.getItem(APPOINTMENTS_KEY);
+            if (!raw) {
+              localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify([]));
+              return [];
+            }
+
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (error) {
+            return [];
+          }
+        }
+
+        function parseTimeToMinutes(value) {
+          if (!value) return 0;
+          const [hours, minutes] = String(value).split(':').map(Number);
+          if (Number.isNaN(hours) || Number.isNaN(minutes)) return 0;
+          return hours * 60 + minutes;
+        }
+
+        function formatTimeFromMinutes(minutes) {
+          const safe = Math.max(0, Number(minutes) || 0);
+          const hours = Math.floor(safe / 60) % 24;
+          const mins = safe % 60;
+          return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        }
+
+        function isHolidayDateActive(date) {
+          const settings = getHolidaySettings();
+          if (!settings.active) return false;
+
+          const targetDate = new Date(date);
+          targetDate.setHours(0, 0, 0, 0);
+
+          if (settings.from) {
+            const fromDate = new Date(`${settings.from}T00:00:00`);
+            if (targetDate < fromDate) return false;
+          }
+
+          if (settings.until) {
+            const untilDate = new Date(`${settings.until}T23:59:59`);
+            if (targetDate > untilDate) return false;
+          }
+
+          return true;
         }
 
         function formatHolidayDate(value) {
@@ -1599,7 +1772,7 @@
           if (!banner) return;
 
           const settings = getHolidaySettings();
-          if (!settings.active) {
+          if (!settings.active || !isHolidayDateActive(new Date())) {
             banner.classList.remove('visible');
             banner.innerHTML = '';
             return;
@@ -1622,7 +1795,7 @@
           if (!heroHoliday) return;
 
           const settings = getHolidaySettings();
-          if (!settings.active) {
+          if (!settings.active || !isHolidayDateActive(new Date())) {
             heroHoliday.classList.remove('visible');
             heroHoliday.innerHTML = '';
             return;
@@ -1640,12 +1813,97 @@
           `;
         }
 
+        function getAvailabilityForDate(date) {
+          const settings = getHolidaySettings();
+          if (isHolidayDateActive(date)) {
+            return {
+              state: 'holiday',
+              status: 'Na wakacjach',
+              hours: `Wracam ${formatHolidayDate(settings.until)}`,
+              badge: 'Wakacje'
+            };
+          }
+
+          const dayIndex = date.getDay();
+          const dayMap = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+          const name = dayMap[dayIndex] || 'Dzień';
+          const regularHours = getOpeningHours().find((entry) => entry.day === name);
+          const value = regularHours ? String(regularHours.value || 'Brak').trim() : 'Brak';
+          const isoDate = date.toISOString().slice(0, 10);
+
+          if (!value || value === 'Brak') {
+            return {
+              state: 'closed',
+              status: 'Brak terminów',
+              hours: 'Nie pracujemy',
+              badge: 'Zamknięte'
+            };
+          }
+
+          const appointments = getAppointments().filter((entry) => entry && entry.date === isoDate);
+          if (appointments.length) {
+            const bookedTimes = appointments.map((entry) => {
+              const start = parseTimeToMinutes(entry.startTime);
+              const duration = Number(entry.durationMinutes || 60);
+              const end = start + duration;
+              return `${formatTimeFromMinutes(start)}-${formatTimeFromMinutes(end)}`;
+            }).join(', ');
+
+            return {
+              state: 'booked',
+              status: 'Częściowo zajęte',
+              hours: `Zajęte: ${bookedTimes}`,
+              badge: 'Zajęte'
+            };
+          }
+
+          return {
+            state: 'open',
+            status: 'Termin dostępny',
+            hours: value,
+            badge: 'Otwarte'
+          };
+        }
+
+        function renderAvailabilityCalendar() {
+          const container = document.getElementById('availabilityCalendar');
+          if (!container) return;
+
+          const start = new Date();
+          start.setHours(0, 0, 0, 0);
+
+          const cells = [];
+          for (let offset = 0; offset < 12; offset += 1) {
+            const date = new Date(start);
+            date.setDate(start.getDate() + offset);
+            const availability = getAvailabilityForDate(date);
+            const shortDay = date.toLocaleDateString('pl-PL', { weekday: 'short' }).replace('.', '');
+            const dayNumber = date.getDate();
+
+            cells.push(`
+              <div class="calendar-day ${availability.state === 'closed' ? 'is-closed' : ''} ${availability.state === 'holiday' ? 'is-holiday' : ''} ${availability.state === 'booked' ? 'is-booked' : ''}">
+                <div class="calendar-header">
+                  <strong>${dayNumber}</strong>
+                  <span class="calendar-badge">${availability.badge}</span>
+                </div>
+                <small>${shortDay}</small>
+                <div class="calendar-hours">
+                  <div>${availability.status}</div>
+                  <div>${availability.hours}</div>
+                </div>
+              </div>
+            `);
+          }
+
+          container.innerHTML = cells.join('');
+        }
+
         function renderOpeningHours() {
           const list = document.querySelector('.hours-list');
           if (!list) return;
 
           const settings = getHolidaySettings();
-          if (settings.active) {
+          if (settings.active && isHolidayDateActive(new Date())) {
             const returnDate = formatHolidayDate(settings.until);
             const message = (settings.message || defaultHolidaySettings.message)
               .replace('{date}', returnDate)
@@ -1656,6 +1914,7 @@
             `;
             renderHolidayBanner();
             renderHolidayHero();
+            renderAvailabilityCalendar();
             return;
           }
 
@@ -1666,6 +1925,7 @@
 
           renderHolidayBanner();
           renderHolidayHero();
+          renderAvailabilityCalendar();
         }
 
         window.addEventListener('storage', function (event) {

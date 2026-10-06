@@ -238,6 +238,67 @@
         border-top: 1px solid var(--line);
       }
 
+      .appointment-editor {
+        display: grid;
+        gap: 16px;
+      }
+
+      .appointment-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .appointment-editor input,
+      .appointment-editor select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .appointment-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .appointment-day-box {
+        margin-top: 14px;
+        background: #fffaf7;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .appointment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        background: #fffaf7;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .appointment-item small {
+        display: block;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .appointment-item button {
+        background: #b74d3d;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
       .holiday-toggle {
         display: flex;
         align-items: center;
@@ -378,11 +439,38 @@
                   </label>
 
                   <div class="input-grid">
+                    <input type="date" id="holidayFrom" />
                     <input type="date" id="holidayUntil" />
-                    <input type="text" id="holidayMessage" placeholder="Jestem na wakacjach. Wracam do pracy {date}." />
                   </div>
+
+                  <input type="text" id="holidayMessage" placeholder="Jestem na wakacjach. Wracam do pracy {date}." />
                 </div>
                 <button type="button" class="btn save-pricing-btn" id="saveHolidayBtn">Zapisz wakacje</button>
+              </section>
+
+              <section class="admin-block">
+                <h2>Wizyty</h2>
+                <div class="appointment-editor">
+                  <form id="appointmentForm">
+                    <div class="appointment-form-grid">
+                      <select id="appointmentService" required></select>
+                      <input type="text" id="appointmentHairLength" placeholder="Długość włosów / wariant" value="średnio" required />
+                      <input type="date" id="appointmentDate" required />
+                      <input type="time" id="appointmentStart" required />
+                      <input type="number" id="appointmentDuration" min="30" step="15" value="90" required />
+                      <input type="number" id="appointmentCount" min="1" step="1" value="1" required />
+                    </div>
+                    <button type="submit" class="btn save-pricing-btn" id="appointmentSubmitBtn">Dodaj wizytę</button>
+                  </form>
+                  <div id="appointmentList" class="appointment-list"></div>
+                  <div class="appointment-day-box">
+                    <h3>Widok dnia</h3>
+                    <div class="appointment-form-grid">
+                      <input type="date" id="appointmentDayView" />
+                    </div>
+                    <div id="appointmentDaySummary" class="appointment-list"></div>
+                  </div>
+                </div>
               </section>
 
               <section class="admin-block">
@@ -407,17 +495,30 @@
       </div>
     </main>
 
+    <script src="data-layer.js"></script>
     <script>
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
         const HOURS_KEY = 'kurowska_pracownia_godziny';
         const HOLIDAY_KEY = 'kurowska_pracownia_wakacje';
+        const APPOINTMENTS_KEY = 'kurowska_pracownia_wizyty';
         const ADMIN_LOGIN = 'admin';
         const ADMIN_PASSWORD = 'kurowska2025';
+        const storage = window.KUROWSKA_STORAGE || {
+          getAppointments: () => JSON.parse(localStorage.getItem(APPOINTMENTS_KEY) || '[]'),
+          saveAppointments: (value) => localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(value)),
+          getHolidaySettings: () => JSON.parse(localStorage.getItem(HOLIDAY_KEY) || '{"active":false,"from":"","until":"","message":"Jestem na wakacjach. Wracam do pracy {date}."}'),
+          saveHolidaySettings: (value) => localStorage.setItem(HOLIDAY_KEY, JSON.stringify(value)),
+          getOpeningHours: () => JSON.parse(localStorage.getItem(HOURS_KEY) || '[]'),
+          saveOpeningHours: (value) => localStorage.setItem(HOURS_KEY, JSON.stringify(value)),
+          getServices: () => JSON.parse(localStorage.getItem(SERVICES_KEY) || '[]'),
+          saveServices: (value) => localStorage.setItem(SERVICES_KEY, JSON.stringify(value))
+        };
 
         const defaultHolidaySettings = {
           active: false,
+          from: '',
           until: '',
           message: 'Jestem na wakacjach. Wracam do pracy {date}.'
         };
@@ -531,6 +632,11 @@
 
         function getServices() {
           try {
+            if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.getServices === 'function') {
+              const services = window.KUROWSKA_STORAGE.getServices();
+              if (Array.isArray(services) && services.length) return services;
+            }
+
             const raw = localStorage.getItem(SERVICES_KEY);
             if (!raw) {
               localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
@@ -545,6 +651,11 @@
 
         function getOpeningHours() {
           try {
+            if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.getOpeningHours === 'function') {
+              const hours = window.KUROWSKA_STORAGE.getOpeningHours();
+              if (Array.isArray(hours) && hours.length) return hours;
+            }
+
             const raw = localStorage.getItem(HOURS_KEY);
             if (!raw) {
               localStorage.setItem(HOURS_KEY, JSON.stringify(defaultOpeningHours));
@@ -568,6 +679,11 @@
 
         function getHolidaySettings() {
           try {
+            if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.getHolidaySettings === 'function') {
+              const settings = window.KUROWSKA_STORAGE.getHolidaySettings();
+              if (settings) return { ...defaultHolidaySettings, ...settings };
+            }
+
             const raw = localStorage.getItem(HOLIDAY_KEY);
             if (!raw) {
               localStorage.setItem(HOLIDAY_KEY, JSON.stringify(defaultHolidaySettings));
@@ -577,12 +693,37 @@
             const parsed = JSON.parse(raw);
             return {
               active: Boolean(parsed.active),
+              from: String(parsed.from || '').trim(),
               until: String(parsed.until || '').trim(),
               message: String(parsed.message || '').trim() || defaultHolidaySettings.message
             };
           } catch (error) {
             return { ...defaultHolidaySettings };
           }
+        }
+
+        function getAppointments() {
+          try {
+            const list = storage.getAppointments && typeof storage.getAppointments === 'function' ? storage.getAppointments() : [];
+            return Array.isArray(list) ? list : [];
+          } catch (error) {
+            return [];
+          }
+        }
+
+        function saveAppointments(list) {
+          if (storage.saveAppointments && typeof storage.saveAppointments === 'function') {
+            storage.saveAppointments(list);
+            return;
+          }
+          localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(list));
+        }
+
+        function formatDateForInput(date) {
+          if (!date) return '';
+          const value = new Date(`${date}T00:00:00`);
+          if (Number.isNaN(value.getTime())) return '';
+          return value.toISOString().slice(0, 10);
         }
 
         function renderHoursEditor() {
@@ -600,44 +741,267 @@
 
         function renderHolidayEditor() {
           const activeInput = document.getElementById('holidayActive');
+          const fromInput = document.getElementById('holidayFrom');
           const untilInput = document.getElementById('holidayUntil');
           const messageInput = document.getElementById('holidayMessage');
-          if (!activeInput || !untilInput || !messageInput) return;
+          if (!activeInput || !fromInput || !untilInput || !messageInput) return;
 
           const settings = getHolidaySettings();
           activeInput.checked = Boolean(settings.active);
+          fromInput.value = settings.from || '';
           untilInput.value = settings.until || '';
           messageInput.value = settings.message || defaultHolidaySettings.message;
         }
 
-        function saveOpeningHours() {
+        async function saveOpeningHours() {
           const inputs = document.querySelectorAll('#hoursEditor input');
           const nextHours = Array.from(inputs).map((input) => ({
             day: input.dataset.day || input.id.replace('hours-', ''),
             value: input.value.trim() || 'Brak'
           }));
 
-          localStorage.setItem(HOURS_KEY, JSON.stringify(nextHours));
+          if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.persistToBackend === 'function') {
+            await window.KUROWSKA_STORAGE.persistToBackend(HOURS_KEY, '/api/hours', nextHours, 'POST');
+          } else {
+            localStorage.setItem(HOURS_KEY, JSON.stringify(nextHours));
+          }
+
           window.dispatchEvent(new Event('kurowska-settings-updated'));
           alert('Zapisano godziny otwarcia.');
         }
 
-        function saveHolidaySettings() {
+        async function saveHolidaySettings() {
           const activeInput = document.getElementById('holidayActive');
+          const fromInput = document.getElementById('holidayFrom');
           const untilInput = document.getElementById('holidayUntil');
           const messageInput = document.getElementById('holidayMessage');
 
-          if (!activeInput || !untilInput || !messageInput) return;
+          if (!activeInput || !fromInput || !untilInput || !messageInput) return;
 
           const nextSettings = {
             active: activeInput.checked,
+            from: fromInput.value,
             until: untilInput.value,
             message: messageInput.value.trim() || defaultHolidaySettings.message
           };
 
-          localStorage.setItem(HOLIDAY_KEY, JSON.stringify(nextSettings));
+          if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.persistToBackend === 'function') {
+            await window.KUROWSKA_STORAGE.persistToBackend(HOLIDAY_KEY, '/api/holiday', nextSettings, 'POST');
+          } else {
+            localStorage.setItem(HOLIDAY_KEY, JSON.stringify(nextSettings));
+          }
+
           window.dispatchEvent(new Event('kurowska-settings-updated'));
           alert('Zapisano ustawienia wakacji.');
+        }
+
+        function renderAppointmentOptions() {
+          const select = document.getElementById('appointmentService');
+          if (!select) return;
+
+          const services = getServices();
+          select.innerHTML = services.map((service) => `
+            <option value="${service.slug}">${service.name}</option>
+          `).join('');
+
+          if (!select.value) {
+            select.value = services[0]?.slug || '';
+          }
+        }
+
+        function renderAppointments() {
+          const container = document.getElementById('appointmentList');
+          if (!container) return;
+
+          const appointments = getAppointments();
+          if (!appointments.length) {
+            container.innerHTML = '<div class="appointment-item"><div><strong>Brak zaplanowanych wizyt</strong><small>Dodaj nową wizytę z formularza.</small></div></div>';
+            return;
+          }
+
+          const services = getServices();
+          container.innerHTML = appointments.map((appointment) => {
+            const service = services.find((item) => item.slug === appointment.service) || { name: appointment.service || 'Usługa' };
+            const label = `${service.name || 'Usługa'} • ${appointment.hairLength || 'Długość włosów'}`;
+            const duration = Number(appointment.durationMinutes || 60);
+            const endTime = appointment.startTime ? getEndTime(appointment.startTime, duration) : '';
+            const id = String(appointment.id || `${appointment.date}-${appointment.startTime}`);
+            return `
+              <div class="appointment-item">
+                <div>
+                  <strong>${label}</strong>
+                  <small>${appointment.date} • ${appointment.startTime}${endTime ? ` - ${endTime}` : ''} • ${duration} min</small>
+                </div>
+                <div>
+                  <button type="button" data-action="edit" data-id="${id}" style="margin-right:8px;">Edytuj</button>
+                  <button type="button" data-action="delete" data-id="${id}">Usuń</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          container.querySelectorAll('button[data-action]').forEach((button) => {
+            button.addEventListener('click', async () => {
+              const id = button.dataset.id;
+              if (button.dataset.action === 'delete') {
+                const next = getAppointments().filter((appointment) => String(appointment.id || `${appointment.date}-${appointment.startTime}`) !== id);
+                if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.persistToBackend === 'function') {
+                  await window.KUROWSKA_STORAGE.persistToBackend(APPOINTMENTS_KEY, '/api/appointments', next, 'POST');
+                }
+                saveAppointments(next);
+                renderAppointments();
+                renderDayAvailability();
+                return;
+              }
+
+              const appointment = getAppointments().find((item) => String(item.id || `${item.date}-${item.startTime}`) === id);
+              if (!appointment) return;
+
+              document.getElementById('appointmentService').value = appointment.service || '';
+              document.getElementById('appointmentHairLength').value = appointment.hairLength || '';
+              document.getElementById('appointmentDate').value = appointment.date || '';
+              document.getElementById('appointmentStart').value = appointment.startTime || '';
+              document.getElementById('appointmentDuration').value = appointment.durationMinutes || 60;
+              document.getElementById('appointmentCount').value = appointment.count || 1;
+              document.getElementById('appointmentForm').dataset.editId = id;
+              document.getElementById('appointmentSubmitBtn').textContent = 'Zapisz zmiany';
+              window.scrollTo({ top: document.getElementById('appointmentForm').offsetTop - 20, behavior: 'smooth' });
+            });
+          });
+        }
+
+        function renderDayAvailability(dateValue) {
+          const summary = document.getElementById('appointmentDaySummary');
+          if (!summary) return;
+
+          const selectedDate = dateValue || document.getElementById('appointmentDayView')?.value || new Date().toISOString().slice(0, 10);
+          const appointments = getAppointments().filter((item) => item.date === selectedDate).sort((a, b) => a.startTime.localeCompare(b.startTime));
+          const weekday = new Date(`${selectedDate}T12:00:00`).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
+
+          if (!appointments.length) {
+            summary.innerHTML = `
+              <div class="appointment-item">
+                <div>
+                  <strong>${weekday}</strong>
+                  <small>Brak zarezerwowanych wizyt.</small>
+                </div>
+              </div>
+            `;
+            return;
+          }
+
+          const services = getServices();
+          summary.innerHTML = appointments.map((appointment) => {
+            const service = services.find((item) => item.slug === appointment.service) || { name: appointment.service || 'Usługa' };
+            const endTime = getEndTime(appointment.startTime, Number(appointment.durationMinutes || 60));
+            return `
+              <div class="appointment-item">
+                <div>
+                  <strong>${service.name || 'Usługa'} • ${appointment.hairLength || 'Długość włosów'}</strong>
+                  <small>${appointment.startTime} - ${endTime} • ${appointment.count || 1} równoległa${Number(appointment.count || 1) > 1 ? 'e' : 'a'} wizyta</small>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        function getEndTime(startTime, durationMinutes) {
+          if (!startTime) return '';
+          const [hours, minutes] = String(startTime).split(':').map(Number);
+          const start = new Date();
+          start.setHours(hours || 0, minutes || 0, 0, 0);
+          start.setMinutes(start.getMinutes() + Number(durationMinutes || 0));
+          return `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function validateAppointmentForm(form) {
+          const input = {
+            service: form.service.value.trim(),
+            hairLength: form.hairLength.value.trim(),
+            date: form.date.value,
+            startTime: form.startTime.value,
+            durationMinutes: Number(form.duration.value) || 60,
+            count: Number(form.count.value) || 1
+          };
+
+          if (!input.service || !input.hairLength || !input.date || !input.startTime) {
+            alert('Uzupełnij wszystkie pola wizyty.');
+            return null;
+          }
+
+          if (input.durationMinutes < 30) {
+            alert('Czas trwania wizyty musi wynosić co najmniej 30 minut.');
+            return null;
+          }
+
+          if (input.count < 1) {
+            alert('Liczba równoległych wizyt nie może być mniejsza niż 1.');
+            return null;
+          }
+
+          return input;
+        }
+
+        async function handleAppointmentSubmit(event) {
+          event.preventDefault();
+          const form = document.getElementById('appointmentForm');
+          const serviceSelect = document.getElementById('appointmentService');
+          const hairInput = document.getElementById('appointmentHairLength');
+          const dateInput = document.getElementById('appointmentDate');
+          const startInput = document.getElementById('appointmentStart');
+          const durationInput = document.getElementById('appointmentDuration');
+          const countInput = document.getElementById('appointmentCount');
+
+          const appointment = validateAppointmentForm({
+            service: serviceSelect,
+            hairLength: hairInput,
+            date: dateInput,
+            startTime: startInput,
+            duration: durationInput,
+            count: countInput
+          });
+
+          if (!appointment) return;
+
+          const nextAppointments = getAppointments();
+          const editId = form.dataset.editId;
+          const payload = {
+            id: editId || Date.now(),
+            service: appointment.service,
+            hairLength: appointment.hairLength,
+            date: appointment.date,
+            startTime: appointment.startTime,
+            durationMinutes: appointment.durationMinutes,
+            count: appointment.count,
+            createdAt: new Date().toISOString()
+          };
+
+          if (editId) {
+            const index = nextAppointments.findIndex((item) => String(item.id || `${item.date}-${item.startTime}`) === String(editId));
+            if (index >= 0) {
+              nextAppointments[index] = { ...nextAppointments[index], ...payload };
+            }
+          } else {
+            nextAppointments.push(payload);
+          }
+
+          if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.persistToBackend === 'function') {
+            await window.KUROWSKA_STORAGE.persistToBackend(APPOINTMENTS_KEY, '/api/appointments', nextAppointments, 'POST');
+          }
+
+          saveAppointments(nextAppointments);
+          renderAppointments();
+          renderDayAvailability(document.getElementById('appointmentDayView').value || appointment.date);
+          form.reset();
+          form.removeAttribute('data-edit-id');
+          document.getElementById('appointmentSubmitBtn').textContent = 'Dodaj wizytę';
+          document.getElementById('appointmentDuration').value = 90;
+          document.getElementById('appointmentCount').value = 1;
+          const serviceSelector = document.getElementById('appointmentService');
+          if (serviceSelector && serviceSelector.options.length) {
+            serviceSelector.value = serviceSelector.options[0].value;
+          }
+          alert(editId ? 'Zapisano zmiany w wizycie.' : 'Dodano wizytę do kalendarza.');
         }
 
         function isLoggedIn() {
@@ -678,7 +1042,7 @@
           }).join('');
         }
 
-        function saveServices() {
+        async function saveServices() {
           const serviceCards = document.querySelectorAll('.service-editor-card');
           const nextServices = Array.from(serviceCards).map((card) => {
             const name = card.querySelector('[data-field="name"]').value.trim();
@@ -695,7 +1059,12 @@
             return { slug, name, description, startingPrice, prices };
           });
 
-          localStorage.setItem(SERVICES_KEY, JSON.stringify(nextServices));
+          if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.persistToBackend === 'function') {
+            await window.KUROWSKA_STORAGE.persistToBackend(SERVICES_KEY, '/api/services', nextServices, 'POST');
+          } else {
+            localStorage.setItem(SERVICES_KEY, JSON.stringify(nextServices));
+          }
+
           renderServiceEditor();
           alert('Zapisano ceny usług.');
         }
@@ -777,9 +1146,11 @@
             loginBox.style.display = 'none';
             adminArea.classList.add('visible');
             logoutBtn.style.display = 'inline-block';
+            renderAppointmentOptions();
             renderServiceEditor();
             renderHoursEditor();
             renderHolidayEditor();
+            renderAppointments();
             renderReviews();
           } else {
             loginError.classList.add('visible');
@@ -804,14 +1175,30 @@
         document.getElementById('savePricingBtn').addEventListener('click', saveServices);
         document.getElementById('saveHoursBtn').addEventListener('click', saveOpeningHours);
         document.getElementById('saveHolidayBtn').addEventListener('click', saveHolidaySettings);
+        document.getElementById('appointmentForm').addEventListener('submit', handleAppointmentSubmit);
+
+        const dayViewInput = document.getElementById('appointmentDayView');
+        if (dayViewInput) {
+          dayViewInput.value = new Date().toISOString().slice(0, 10);
+          dayViewInput.addEventListener('change', function () {
+            renderDayAvailability(this.value);
+          });
+        }
+
+        if (document.getElementById('appointmentDate')) {
+          document.getElementById('appointmentDate').value = new Date().toISOString().slice(0, 10);
+        }
 
         if (isLoggedIn()) {
           loginBox.style.display = 'none';
           adminArea.classList.add('visible');
           logoutBtn.style.display = 'inline-block';
+          renderAppointmentOptions();
           renderServiceEditor();
           renderHoursEditor();
           renderHolidayEditor();
+          renderAppointments();
+          renderDayAvailability();
           renderReviews();
         }
       })();
