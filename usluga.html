@@ -113,6 +113,47 @@
         box-shadow: 0 18px 35px rgba(50, 35, 29, 0.07);
       }
 
+      .steps-block {
+        margin-top: 30px;
+      }
+
+      .steps-block h3 {
+        margin: 0 0 18px;
+        font-size: 1.5rem;
+      }
+
+      .steps-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+      }
+
+      .step-count {
+        display: inline-grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--secondary), var(--secondary-strong));
+        color: #fff;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .step-item p {
+        margin: 0;
+        color: var(--muted);
+      }
+
       .price-list {
         display: grid;
         gap: 14px;
@@ -204,6 +245,12 @@
 
         <div class="service-card">
           <div class="price-list" id="priceList"></div>
+
+          <div class="steps-block">
+            <h3>Jak wygląda zabieg krok po kroku</h3>
+            <div class="steps-list" id="stepsList"></div>
+          </div>
+
           <div class="cta-row">
             <a class="btn" href="index.html#kontakt">Umów wizytę</a>
             <a class="btn" href="index.html#uslugi" style="background: transparent; border: 1px solid var(--line); color: var(--text); box-shadow: none;">Wróć do cennika</a>
@@ -227,6 +274,7 @@
             name: 'Strzyżenie męskie',
             description: 'Krótkie i klasyczne cięcia',
             startingPrice: 50,
+            steps: ['Konsultacja', 'Cięcie', 'Stylizacja'],
             prices: [
               { label: 'Krótkie', value: 50 },
               { label: 'Średnie', value: 70 },
@@ -238,6 +286,7 @@
             name: 'Strzyżenie damskie',
             description: 'Fryzura na miarę, z cięciem i modelowaniem',
             startingPrice: 80,
+            steps: ['Konsultacja', 'Cięcie', 'Modelowanie'],
             prices: [
               { label: 'Do ramion', value: 80 },
               { label: 'Do łopatek', value: 120 },
@@ -249,6 +298,7 @@
             name: 'Mycie włosów',
             description: 'Delikatne oczyszczanie i masaż skóry głowy',
             startingPrice: 30,
+            steps: ['Ocena włosów', 'Mycie', 'Dopasowanie pielęgnacji'],
             prices: [
               { label: 'Krótko', value: 30 },
               { label: 'Średnio', value: 40 },
@@ -260,6 +310,7 @@
             name: 'Modelowanie włosów',
             description: 'Stylizacja na co dzień i na specjalne okazje',
             startingPrice: 70,
+            steps: ['Konsultacja', 'Stylizacja', 'Fiksacja'],
             prices: [
               { label: 'Krótko', value: 70 },
               { label: 'Średnio', value: 95 },
@@ -271,6 +322,7 @@
             name: 'Koloryzacja',
             description: 'Pełna lub częściowa, tonowanie i korekta koloru',
             startingPrice: 180,
+            steps: ['Dobór koloru', 'Aplikacja', 'Finalna korekta'],
             prices: [
               { label: 'Korzenie', value: 180 },
               { label: 'Połowa głowy', value: 230 },
@@ -282,6 +334,7 @@
             name: 'Balayage / ombre',
             description: 'Naturalne przejścia kolorystyczne',
             startingPrice: 260,
+            steps: ['Konsultacja', 'Rozjaśnienie', 'Wykończenie'],
             prices: [
               { label: 'Krótko', value: 260 },
               { label: 'Średnio', value: 330 },
@@ -293,6 +346,7 @@
             name: 'Regeneracja włosów',
             description: 'Maska, odbudowa i nawilżenie',
             startingPrice: 120,
+            steps: ['Diagnoza', 'Maska i odbudowa', 'Nawilżenie'],
             prices: [
               { label: 'Krótko', value: 120 },
               { label: 'Średnio', value: 150 },
@@ -304,6 +358,7 @@
             name: 'Keratynizacja / prostowanie',
             description: 'Gładkie i lśniące włosy na dłużej',
             startingPrice: 250,
+            steps: ['Oczyszczenie', 'Keratynizacja', 'Efekt końcowy'],
             prices: [
               { label: 'Krótko', value: 250 },
               { label: 'Średnio', value: 320 },
@@ -334,6 +389,7 @@
           const title = document.getElementById('serviceTitle');
           const intro = document.getElementById('serviceIntro');
           const priceList = document.getElementById('priceList');
+          const stepsList = document.getElementById('stepsList');
 
           if (!service) {
             title.textContent = 'Brak usługi';
@@ -346,11 +402,23 @@
           document.title = `${service.name} | Kurowska Pracownia Fryzjerska`;
 
           const prices = Array.isArray(service.prices) && service.prices.length ? service.prices : [{ label: 'Cena', value: Number(service.startingPrice) || 0 }];
+          const steps = Array.isArray(service.steps) && service.steps.length ? service.steps : ['Konsultacja', 'Dobór stylu', 'Efekt'];
+          const detail = service.detail || 'To usługa dopasowana do Twoich potrzeb, która poprawia wygląd, komfort i trwałość efektu.';
+
+          intro.textContent = detail;
+          document.title = `${service.name} | Kurowska Pracownia Fryzjerska`;
 
           priceList.innerHTML = prices.map((item) => `
             <div class="price-row">
               <span>${item.label || 'Cena'}</span>
               <strong>${Number(item.value) || 0} zł</strong>
+            </div>
+          `).join('');
+
+          stepsList.innerHTML = steps.map((step, index) => `
+            <div class="step-item">
+              <span class="step-count">${index + 1}</span>
+              <p>${step}</p>
             </div>
           `).join('');
         }

@@ -304,10 +304,113 @@
         transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       }
 
+      .feature:hover,
+      .process-step:hover,
+      .faq-item:hover,
+      .summary-card:hover,
+      .gallery-card:hover .gallery-item,
+      .review-item:hover,
+      .price-item:hover,
+      .contact-card:hover,
+      .hours-card:hover {
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 18px 32px rgba(16, 16, 16, 0.12);
+      }
+
+      .process-grid,
+      .faq-list {
+        display: grid;
+        gap: 20px;
+      }
+
+      .process-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .process-step {
+        position: relative;
+        background: linear-gradient(180deg, rgba(17, 17, 17, 0.98), rgba(32, 28, 24, 0.96));
+        border: 1px solid rgba(214, 200, 167, 0.25);
+        border-radius: 24px;
+        padding: 28px 22px;
+        overflow: hidden;
+        box-shadow: 0 18px 35px rgba(10, 10, 10, 0.22);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+
+      .process-step::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(195, 154, 77, 0.2), transparent 35%);
+        pointer-events: none;
+      }
+
+      .step-number {
+        position: relative;
+        z-index: 1;
+        display: inline-grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--secondary), var(--secondary-strong));
+        color: #fff;
+        font-weight: 800;
+        margin-bottom: 16px;
+      }
+
+      .process-step h4 {
+        position: relative;
+        z-index: 1;
+        margin: 0 0 10px;
+        color: #f8f2ea;
+      }
+
+      .process-step p,
+      .faq-item p {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        color: rgba(243, 239, 232, 0.78);
+      }
+
+      .faq-list {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      .faq-item {
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        border: 1px solid rgba(214, 200, 167, 0.25);
+        border-radius: 20px;
+        padding: 20px 22px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+
+      .faq-item strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.02rem;
+        color: #f9f2ea;
+      }
+
       .feature:hover {
         transform: translateY(-8px) scale(1.02);
         box-shadow: 0 25px 40px rgba(56, 38, 31, 0.08);
         border-color: rgba(180, 104, 79, 0.35);
+      }
+
+      #jak-dziala,
+      #faq {
+        background: linear-gradient(180deg, rgba(17, 17, 17, 0.98), rgba(28, 24, 20, 0.96));
+        color: #f2efe9;
+      }
+
+      #jak-dziala .section-heading p,
+      #faq .section-heading p {
+        color: rgba(242, 239, 233, 0.75);
       }
 
       .feature .icon {
@@ -355,6 +458,43 @@
         gap: 12px;
         transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
         color: #f3efe8;
+      }
+
+      .service-copy {
+        display: grid;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .service-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .service-steps span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(195, 154, 77, 0.12);
+        border: 1px solid rgba(195, 154, 77, 0.22);
+        border-radius: 999px;
+        padding: 5px 8px;
+        font-size: 0.72rem;
+        color: rgba(243, 239, 232, 0.9);
+      }
+
+      .service-steps em {
+        display: inline-grid;
+        place-items: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--secondary);
+        color: #111;
+        font-style: normal;
+        font-weight: 700;
+        font-size: 0.62rem;
       }
 
       .price-item:hover {
@@ -904,6 +1044,33 @@
         </div>
       </section>
 
+      <section class="section" id="jak-dziala">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Jak wygląda nasza współpraca</h2>
+            <p>Prosty, komfortowy proces od pierwszego kontaktu do efektu końcowego.</p>
+          </div>
+
+          <div class="process-grid">
+            <div class="process-step">
+              <div class="step-number">1</div>
+              <h4>Kontakt</h4>
+              <p>Umów wizytę telefonicznie lub przez formularz i opisz, czego potrzebujesz.</p>
+            </div>
+            <div class="process-step">
+              <div class="step-number">2</div>
+              <h4>Dobór stylu</h4>
+              <p>Razem ustalamy fryzurę, koloryzację i rozwiązania dopasowane do Ciebie.</p>
+            </div>
+            <div class="process-step">
+              <div class="step-number">3</div>
+              <h4>Efekt</h4>
+              <p>Wykonujemy usługę z dbałością o detale i naturalny, trwały efekt.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="realizacje">
         <div class="container">
           <div class="section-heading">
@@ -942,6 +1109,34 @@
                 <span class="gallery-label">Stylizacja</span>
               </div>
               <a class="gallery-link" href="realizacje.html#stylizacja">Zobacz więcej</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Najczęstsze pytania</h2>
+            <p>Najważniejsze informacje, które pomagają podjąć decyzję o rezerwacji.</p>
+          </div>
+
+          <div class="faq-list">
+            <div class="faq-item">
+              <strong>Czy pracujecie mobilnie?</strong>
+              <p>Tak, świadczenie usług odbywa się w dogodnym miejscu dla klienta, w zależności od umówionej wizyty.</p>
+            </div>
+            <div class="faq-item">
+              <strong>Jak dobrać fryzurę do twarzy?</strong>
+              <p>Podczas konsultacji dobieramy kształt, długość i styl do Twojej twarzy, codziennych potrzeb oraz charakteru.</p>
+            </div>
+            <div class="faq-item">
+              <strong>Czy można umówić wizytę na konkretną godzinę?</strong>
+              <p>Tak. Wystarczy skontaktować się telefonicznie, aby dobrać termin dogodny dla Ciebie.</p>
+            </div>
+            <div class="faq-item">
+              <strong>Czy oferujecie konsultacje przed zabiegiem?</strong>
+              <p>Tak, przed wykonaniem usługi omawiamy oczekiwania oraz dobieramy najlepsze rozwiązanie.</p>
             </div>
           </div>
         </div>
@@ -1100,7 +1295,9 @@
             slug: 'strzyzenie-meskie',
             name: 'Strzyżenie męskie',
             description: 'Krótkie i klasyczne cięcia',
+            detail: 'To usługa, która dopasowuje fryzurę do kształtu twarzy, rodzaju włosów i stylu życia. Polega na precyzyjnym cięciu oraz modelowaniu, dzięki czemu efekt wygląda schludnie i naturalnie przez dłuższy czas.',
             startingPrice: 50,
+            steps: ['Konsultacja', 'Cięcie', 'Stylizacja'],
             prices: [
               { label: 'Krótkie', value: 50 },
               { label: 'Średnie', value: 70 },
@@ -1111,7 +1308,9 @@
             slug: 'strzyzenie-damskie',
             name: 'Strzyżenie damskie',
             description: 'Fryzura na miarę, z cięciem i modelowaniem',
+            detail: 'Strzyżenie damskie polega na indywidualnym dopasowaniu długości, grzywki i objętości do twarzy oraz preferencji klientki. Efekt końcowy tworzy się dzięki cięciu, a następnie modelowaniu, by fryzura wyglądała lekko i estetycznie.',
             startingPrice: 80,
+            steps: ['Konsultacja', 'Cięcie', 'Modelowanie'],
             prices: [
               { label: 'Do ramion', value: 80 },
               { label: 'Do łopatek', value: 120 },
@@ -1122,7 +1321,9 @@
             slug: 'mycie-wlosow',
             name: 'Mycie włosów',
             description: 'Delikatne oczyszczanie i masaż skóry głowy',
+            detail: 'Mycie włosów to nie tylko oczyszczenie, ale też masaż skóry głowy i przygotowanie fryzury do stylizacji. Dobrze dobrany szampon oraz odżywka pomagają odbudować włosy i sprawiają, że są miękkie, lśniące i łatwiejsze do ułożenia.',
             startingPrice: 30,
+            steps: ['Ocena włosów', 'Mycie', 'Dopasowanie pielęgnacji'],
             prices: [
               { label: 'Krótko', value: 30 },
               { label: 'Średnio', value: 40 },
@@ -1133,7 +1334,9 @@
             slug: 'modelowanie-wlosow',
             name: 'Modelowanie włosów',
             description: 'Stylizacja na co dzień i na specjalne okazje',
+            detail: 'Modelowanie to zabieg polegający na ułożeniu włosów przy użyciu profesjonalnych narzędzi i produktów, dzięki czemu fryzura utrzymuje kształt, objętość i połysk. Jest świetnym wyborem zarówno na codzienny look, jak i na ważne wyjście.',
             startingPrice: 70,
+            steps: ['Konsultacja', 'Stylizacja', 'Fiksacja'],
             prices: [
               { label: 'Krótko', value: 70 },
               { label: 'Średnio', value: 95 },
@@ -1144,7 +1347,9 @@
             slug: 'koloryzacja',
             name: 'Koloryzacja',
             description: 'Pełna lub częściowa, tonowanie i korekta koloru',
+            detail: 'Koloryzacja zmienia odcień włosów, poprawia efekt wizualny i daje możliwość uzyskania bardziej żywego lub naturalnego rezultatu. Zabieg polega na dobieraniu odpowiedniego tonu i aplikacji farby lub tonera, aby kolor był równomierny i trwały.',
             startingPrice: 180,
+            steps: ['Dobór koloru', 'Aplikacja', 'Finalna korekta'],
             prices: [
               { label: 'Korzenie', value: 180 },
               { label: 'Połowa głowy', value: 230 },
@@ -1155,7 +1360,9 @@
             slug: 'balayage-ombre',
             name: 'Balayage / ombre',
             description: 'Naturalne przejścia kolorystyczne',
+            detail: 'Balayage i ombre tworzą delikatne, naturalne przejścia kolorystyczne, które dodają włosom objętości i głębi. Technika polega na ręcznym rozjaśnianiu lub farbowaniu wybranych partii włosów, dzięki czemu efekt wygląda lekko i premium.',
             startingPrice: 260,
+            steps: ['Konsultacja', 'Rozjaśnienie', 'Wykończenie'],
             prices: [
               { label: 'Krótko', value: 260 },
               { label: 'Średnio', value: 330 },
@@ -1166,7 +1373,9 @@
             slug: 'regeneracja-wlosow',
             name: 'Regeneracja włosów',
             description: 'Maska, odbudowa i nawilżenie',
+            detail: 'Regeneracja włosów to zabieg pielęgnacyjny mający na celu odbudowę struktury, nawilżenie i wygładzenie kosmyków. Dzięki maskom i odżywkom włosy stają się bardziej miękkie, mniej podatne na łamanie oraz lepiej odzyskują zdrowy wygląd.',
             startingPrice: 120,
+            steps: ['Diagnoza', 'Maska i odbudowa', 'Nawilżenie'],
             prices: [
               { label: 'Krótko', value: 120 },
               { label: 'Średnio', value: 150 },
@@ -1177,7 +1386,9 @@
             slug: 'keratynizacja-prostowanie',
             name: 'Keratynizacja / prostowanie',
             description: 'Gładkie i lśniące włosy na dłużej',
+            detail: 'Keratynizacja polega na wygładzeniu włosów za pomocą preparatów wzmacniających i nawilżających, które zmniejszają puszenie i ułatwiają układanie. To rozwiązanie idealne dla osób, które chcą uzyskać efekt gładkich, lśniących i łatwych w stylizacji włosów.',
             startingPrice: 250,
+            steps: ['Oczyszczenie', 'Keratynizacja', 'Efekt końcowy'],
             prices: [
               { label: 'Krótko', value: 250 },
               { label: 'Średnio', value: 320 },
@@ -1266,14 +1477,18 @@
           grid.innerHTML = services.map((service) => {
             const name = service.name || 'Usługa';
             const description = service.description || 'Sprawdź szczegóły';
+            const detail = service.detail || 'Szczegółowy opis zabiegu dostępny po wejściu na podstronę usługi.';
             const startingPrice = Number(service.startingPrice) || 0;
             const priceText = startingPrice ? `od ${startingPrice} zł` : 'Sprawdź cenę';
+            const steps = Array.isArray(service.steps) && service.steps.length ? service.steps.slice(0, 3) : ['Konsultacja', 'Dobór stylu', 'Efekt'];
 
             return `
               <a class="price-item service-link" href="usluga.html?slug=${encodeURIComponent(service.slug || name.toLowerCase())}">
-                <div>
+                <div class="service-copy">
                   <span class="service-name">${name}</span>
                   <span class="service-desc">${description}</span>
+                  <span class="service-desc" style="font-size: 0.78rem; margin-top: 2px; line-height: 1.5; color: rgba(243, 239, 232, 0.8);">${detail}</span>
+                  <span class="service-steps">${steps.map((step, index) => `<span><em>${index + 1}</em>${step}</span>`).join('')}</span>
                 </div>
                 <span class="service-price">${priceText}</span>
               </a>
