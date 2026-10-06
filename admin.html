@@ -212,6 +212,25 @@
         color: #7d3027;
       }
 
+      .admin-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      .refresh-btn {
+        border: none;
+        border-radius: 999px;
+        background: rgba(141, 107, 46, 0.12);
+        color: var(--secondary-strong);
+        padding: 8px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
       .hours-editor-grid {
         display: grid;
         gap: 12px;
@@ -482,7 +501,10 @@
               </section>
 
               <section class="admin-block">
-                <h2>Opinie klientów</h2>
+                <div class="admin-header-row">
+                  <h2>Opinie klientów</h2>
+                  <button type="button" class="refresh-btn" id="refreshReviewsBtn">Odśwież dane</button>
+                </div>
                 <div class="review-table-wrap">
                   <table class="review-table">
                     <thead>
@@ -1166,6 +1188,34 @@
           alert('Zapisano ceny usług.');
         }
 
+        async function forceRefreshReviews() {
+          try {
+            const response = await fetch('/api/reviews', {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json'
+              }
+            });
+
+            if (!response.ok) {
+              await renderReviews();
+              return null;
+            }
+
+            const data = await response.json();
+            if (Array.isArray(data)) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+              await renderReviews();
+              return data;
+            }
+          } catch (error) {
+            console.error('Review refresh failed:', error);
+          }
+
+          await renderReviews();
+          return null;
+        }
+
         async function renderReviews() {
           const tbody = document.getElementById('adminReviews');
           if (!tbody) return;
@@ -1323,6 +1373,13 @@
         document.getElementById('saveHoursBtn').addEventListener('click', saveOpeningHours);
         document.getElementById('saveHolidayBtn').addEventListener('click', saveHolidaySettings);
         document.getElementById('appointmentForm').addEventListener('submit', handleAppointmentSubmit);
+
+        const refreshReviewsBtn = document.getElementById('refreshReviewsBtn');
+        if (refreshReviewsBtn) {
+          refreshReviewsBtn.addEventListener('click', function () {
+            forceRefreshReviews();
+          });
+        }
 
         const dayViewInput = document.getElementById('appointmentDayView');
         if (dayViewInput) {
