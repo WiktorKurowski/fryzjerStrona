@@ -625,11 +625,70 @@
           }
         ];
 
+        const defaultReviews = [
+          {
+            id: 1,
+            name: 'Anna',
+            surname: 'Kowalska',
+            surnameInitial: 'K',
+            email: 'anna@example.com',
+            rating: 5,
+            message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura idealnie dopasowana do twarzy i wygląda bardzo naturalnie.',
+            createdAt: new Date().toISOString(),
+            hidden: false,
+            status: 'visible'
+          },
+          {
+            id: 2,
+            name: 'Karolina',
+            surname: 'Malinowska',
+            surnameInitial: 'M',
+            email: 'karolina@example.com',
+            rating: 5,
+            message: 'Profesjonalna obsługa, bardzo przyjazna atmosfera i efekt końcowy naprawdę robi wrażenie. Polecam Kurowska Pracownia Fryzjerska.',
+            createdAt: new Date(Date.now() - 86400000).toISOString(),
+            hidden: false,
+            status: 'visible'
+          },
+          {
+            id: 3,
+            name: 'Ewa',
+            surname: 'Nowak',
+            surnameInitial: 'N',
+            email: 'ewa@example.com',
+            rating: 4,
+            message: 'Dobrze dobrane kolory i bardzo sympatyczna obsługa. Włosy wyglądają zdrowo i elegancko po wizycie w salonie.',
+            createdAt: new Date(Date.now() - 172800000).toISOString(),
+            hidden: false,
+            status: 'visible'
+          }
+        ];
+
         const loginBox = document.getElementById('loginBox');
         const adminArea = document.getElementById('adminArea');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
+
+        function getReviews() {
+          try {
+            if (storage.getReviews && typeof storage.getReviews === 'function') {
+              const reviews = storage.getReviews();
+              if (Array.isArray(reviews) && reviews.length) return reviews;
+            }
+
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const list = raw ? JSON.parse(raw) : defaultReviews;
+            if (!Array.isArray(list) || !list.length) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReviews));
+              return [...defaultReviews];
+            }
+
+            return list;
+          } catch (error) {
+            return [...defaultReviews];
+          }
+        }
 
         function getServices() {
           try {
@@ -1075,8 +1134,7 @@
           if (!tbody) return;
 
           try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            const reviews = raw ? JSON.parse(raw) : [];
+            const reviews = getReviews();
 
             if (!Array.isArray(reviews) || !reviews.length) {
               tbody.innerHTML = '<tr><td colspan="5">Brak opinii.</td></tr>';
@@ -1109,7 +1167,7 @@
             document.querySelectorAll('.toggle-btn').forEach((button) => {
               button.addEventListener('click', function () {
                 const id = Number(this.dataset.id);
-                const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                const current = getReviews();
                 const updated = current.map((review) => {
                   if (Number(review.id) !== id) return review;
                   const hidden = this.dataset.hidden === 'true' ? false : true;
@@ -1119,7 +1177,11 @@
                     status: hidden ? 'blocked' : 'visible'
                   };
                 });
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                if (storage.saveReviews && typeof storage.saveReviews === 'function') {
+                  storage.saveReviews(updated);
+                } else {
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                }
                 renderReviews();
               });
             });
@@ -1127,9 +1189,13 @@
             document.querySelectorAll('.delete-btn').forEach((button) => {
               button.addEventListener('click', function () {
                 const id = Number(this.dataset.id);
-                const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                const current = getReviews();
                 const filtered = current.filter((review) => Number(review.id) !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+                if (storage.saveReviews && typeof storage.saveReviews === 'function') {
+                  storage.saveReviews(filtered);
+                } else {
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+                }
                 renderReviews();
               });
             });

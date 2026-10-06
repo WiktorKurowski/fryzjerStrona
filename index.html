@@ -690,13 +690,25 @@
         gap: 30px;
       }
 
+      .calendar-fullwidth {
+        margin-top: 30px;
+        width: 100%;
+      }
+
       .contact-card,
       .hours-card,
+      .availability-card,
       .reviews-card {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 24px;
         padding: 28px;
+      }
+
+      .hours-stack {
+        display: grid;
+        gap: 20px;
+        align-content: start;
       }
 
       .reviews-grid {
@@ -987,7 +999,7 @@
       }
 
       .availability-wrap {
-        margin-top: 20px;
+        margin-top: 0;
       }
 
       .availability-title {
@@ -1001,8 +1013,9 @@
 
       .calendar-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 10px;
+        width: 100%;
       }
 
       .calendar-day {
@@ -1466,22 +1479,26 @@
               </div>
             </div>
 
-            <div class="hours-card">
-              <h3>Godziny otwarcia</h3>
-              <div id="holidayBanner" class="holiday-banner" aria-live="polite"></div>
-              <ul class="hours-list">
-                <li><span>Poniedziałek</span><span>9:00 - 20:00</span></li>
-                <li><span>Wtorek</span><span>9:00 - 20:00</span></li>
-                <li><span>Środa</span><span>9:00 - 20:00</span></li>
-                <li><span>Czwartek</span><span>9:00 - 20:00</span></li>
-                <li><span>Piątek</span><span>9:00 - 20:00</span></li>
-                <li><span>Sobota</span><span>Brak</span></li>
-                <li><span>Niedziela</span><span>Brak</span></li>
-              </ul>
+            <div class="hours-stack">
+              <div class="hours-card">
+                <h3>Godziny otwarcia</h3>
+                <div id="holidayBanner" class="holiday-banner" aria-live="polite"></div>
+                <ul class="hours-list">
+                  <li><span>Poniedziałek</span><span>9:00 - 20:00</span></li>
+                  <li><span>Wtorek</span><span>9:00 - 20:00</span></li>
+                  <li><span>Środa</span><span>9:00 - 20:00</span></li>
+                  <li><span>Czwartek</span><span>9:00 - 20:00</span></li>
+                  <li><span>Piątek</span><span>9:00 - 20:00</span></li>
+                  <li><span>Sobota</span><span>Brak</span></li>
+                  <li><span>Niedziela</span><span>Brak</span></li>
+                </ul>
+              </div>
 
-              <div class="availability-wrap">
-                <p class="availability-title">Kalendarz dostępności</p>
-                <div id="availabilityCalendar" class="calendar-grid"></div>
+              <div class="availability-card calendar-fullwidth">
+                <div class="availability-wrap">
+                  <p class="availability-title">Kalendarz dostępności</p>
+                  <div id="availabilityCalendar" class="calendar-grid"></div>
+                </div>
               </div>
             </div>
           </div>

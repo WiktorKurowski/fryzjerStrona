@@ -10,6 +10,44 @@ const DATA_FILE = path.join(DATA_DIR, 'store.json');
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'kurowska_admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Kurowska!Fryzjer2026#Admin';
 const adminSessions = new Map();
+const DEFAULT_REVIEWS = [
+  {
+    id: 1,
+    name: 'Anna',
+    surname: 'Kowalska',
+    surnameInitial: 'K',
+    email: 'anna@example.com',
+    rating: 5,
+    message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura idealnie dopasowana do twarzy i wygląda bardzo naturalnie.',
+    createdAt: new Date().toISOString(),
+    hidden: false,
+    status: 'visible'
+  },
+  {
+    id: 2,
+    name: 'Karolina',
+    surname: 'Malinowska',
+    surnameInitial: 'M',
+    email: 'karolina@example.com',
+    rating: 5,
+    message: 'Profesjonalna obsługa, bardzo przyjazna atmosfera i efekt końcowy naprawdę robi wrażenie. Polecam Kurowska Pracownia Fryzjerska.',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    hidden: false,
+    status: 'visible'
+  },
+  {
+    id: 3,
+    name: 'Ewa',
+    surname: 'Nowak',
+    surnameInitial: 'N',
+    email: 'ewa@example.com',
+    rating: 4,
+    message: 'Dobrze dobrane kolory i bardzo sympatyczna obsługa. Włosy wyglądają zdrowo i elegancko po wizycie w salonie.',
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    hidden: false,
+    status: 'visible'
+  }
+];
 
 function generateSessionToken() {
   return crypto.randomBytes(32).toString('hex');
@@ -36,7 +74,7 @@ function ensureStore() {
       hours: [],
       holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
       appointments: [],
-      reviews: []
+      reviews: DEFAULT_REVIEWS
     }, null, 2));
   }
 }
@@ -52,7 +90,7 @@ function readStore() {
       hours: [],
       holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
       appointments: [],
-      reviews: []
+      reviews: DEFAULT_REVIEWS
     };
   }
 }
