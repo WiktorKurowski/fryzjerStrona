@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Więcej realizacji | Kurowska Pracownia Fryzjerska</title>
+    <style>
+      :root {
+        --bg: #fff7f2;
+        --card: #fffdfb;
+        --primary: #1f1a1a;
+        --secondary: #b4684f;
+        --secondary-strong: #8d4735;
+        --text: #2a2525;
+        --muted: #6f5f5b;
+        --line: #f0dfd8;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, #fff7f2 0%, #fffaf8 100%);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      a { text-decoration: none; color: inherit; }
+      img { max-width: 100%; display: block; }
+
+      .container {
+        width: min(1160px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 78px;
+      }
+
+      .logo {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .logo span { color: var(--secondary); }
+
+      .nav-links {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        font-weight: 600;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-strong) 100%);
+        color: #fff;
+        padding: 14px 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        box-shadow: 0 12px 28px rgba(180, 104, 79, 0.2);
+      }
+
+      .hero {
+        padding: 90px 0 40px;
+      }
+
+      .hero-card {
+        background: linear-gradient(135deg, #f8e5dd 0%, #fff9f6 100%);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 32px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--secondary-strong);
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3.6rem);
+        letter-spacing: -0.05em;
+      }
+
+      .hero-card p {
+        margin: 0 auto;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .section {
+        padding: 26px 0 80px;
+      }
+
+      .section-heading {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .section-heading h2 {
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+      }
+
+      .section-heading p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .gallery-section {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+      }
+
+      .before-after-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 18px 32px rgba(35, 22, 18, 0.05);
+      }
+
+      .comparison-visual {
+        position: relative;
+        height: 290px;
+        overflow: hidden;
+        background: #f4e4dc;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .comparison-visual img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+      }
+
+      .comparison-after {
+        opacity: 1;
+        z-index: 1;
+      }
+
+      .comparison-before {
+        opacity: 0;
+        z-index: 2;
+        filter: saturate(0.75) contrast(0.95);
+      }
+
+      .comparison-visual:hover .comparison-before {
+        opacity: 1;
+      }
+
+      .comparison-visual:hover .comparison-after {
+        opacity: 0.25;
+        filter: blur(0.5px) brightness(0.8);
+      }
+
+      .comparison-visual:hover img {
+        transform: scale(1.03);
+      }
+
+      .state-label {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 3;
+        background: rgba(25, 18, 16, 0.75);
+        color: #fff;
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        transition: opacity 0.25s ease;
+      }
+
+      .state-after {
+        opacity: 1;
+      }
+
+      .state-before {
+        opacity: 0;
+      }
+
+      .comparison-visual:hover .state-before {
+        opacity: 1;
+      }
+
+      .comparison-visual:hover .state-after {
+        opacity: 0;
+      }
+
+      .card-body {
+        padding: 18px 20px 20px;
+      }
+
+      .card-body h3 {
+        margin: 0 0 10px;
+        font-size: 1.4rem;
+      }
+
+      .card-body p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .back-link {
+        margin-top: 24px;
+        display: inline-block;
+      }
+
+      @media (max-width: 760px) {
+        .nav {
+          flex-wrap: wrap;
+          justify-content: center;
+          padding: 14px 0;
+        }
+
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 14px 18px;
+        }
+
+        .gallery-section {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container nav">
+        <a href="index.html" class="logo">Kurowska <span>Pracownia</span></a>
+        <nav class="nav-links" aria-label="Nawigacja">
+          <a href="index.html#o-nas">O nas</a>
+          <a href="index.html#uslugi">Usługi</a>
+          <a href="index.html#realizacje">Realizacje</a>
+          <a href="index.html#opinie">Opinie</a>
+          <a href="index.html#kontakt">Kontakt</a>
+        </nav>
+        <a class="btn" href="index.html#kontakt">Umów wizytę</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-card">
+            <span class="eyebrow">Więcej inspiracji</span>
+            <h1>Realizacje i efekty „przed i po”</h1>
+            <p>Przeglądaj przykładowe fryzury, koloryzacje i stylizacje wykonane w Kurowska Pracownia Fryzjerska. Każdy efekt jest dopasowany do charakteru klienta, jego włosów i stylu życia.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="blond">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Kolory blond i rozświetlane pasma</h2>
+            <p>Naturalny blask, miękkie przejścia i efekt zdrowych włosów.</p>
+          </div>
+
+          <div class="gallery-section">
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Efekt po blond" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80" alt="Efekt przed blond" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Blond premium</h3>
+                <p>Rozświetlenie, naturalny efekt i miękka, lśniąca powierzchnia włosów.</p>
+              </div>
+            </article>
+
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80" alt="Efekt po blond miodowy" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80" alt="Efekt przed blond miodowy" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Blond miodowy</h3>
+                <p>Delikatny błysk, ciepły odcień i lekkość fryzury na co dzień.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="bob">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Fryzury bob i krótkie cięcia</h2>
+            <p>Nowoczesne, eleganckie i stylowo dopasowane do twarzy.</p>
+          </div>
+
+          <div class="gallery-section">
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80" alt="Efekt po bob" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Efekt przed bob" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Bob z miękkim cięciem</h3>
+                <p>Objętość i lekkość przy zachowaniu naturalnego kształtu fryzury.</p>
+              </div>
+            </article>
+
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80" alt="Efekt po krótka fryzura" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80" alt="Efekt przed krótka fryzura" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Krótka fryzura z objętością</h3>
+                <p>Dynamiczny, żywy efekt z łatwą stylizacją na co dzień.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="koloryzacja">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Koloryzacja i odbudowa</h2>
+            <p>Naturalna głębia koloru, równomierny ton i zdrowy połysk.</p>
+          </div>
+
+          <div class="gallery-section">
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80" alt="Efekt po koloryzacja" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80" alt="Efekt przed koloryzacja" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Koloryzacja w tonacji ciepłej</h3>
+                <p>Głęboki kolor z wyraźnym efektem świeżości i naturalnej jasności.</p>
+              </div>
+            </article>
+
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80" alt="Efekt po koloryzacja 2" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80" alt="Efekt przed koloryzacja 2" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Koloryzacja z poziomem światła</h3>
+                <p>Efekt delikatnej mocy, ciepła i naturalnego przewiewu na włosach.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="stylizacja">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Stylizacja i gotowe looki</h2>
+            <p>Eleganckie, codzienne i okazjonalne stylizacje dopasowane do sylwetki.</p>
+          </div>
+
+          <div class="gallery-section">
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Efekt po stylizacja" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80" alt="Efekt przed stylizacja" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Stylizacja z blaskiem</h3>
+                <p>Efekt pełnej kontroli i lustrzanego połysku na co dzień i na specjalne okazje.</p>
+              </div>
+            </article>
+
+            <article class="before-after-card">
+              <div class="comparison-visual">
+                <img class="comparison-after" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80" alt="Efekt po stylizacja 2" />
+                <img class="comparison-before" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80" alt="Efekt przed stylizacja 2" />
+                <span class="state-label state-after">Po</span>
+                <span class="state-label state-before">Przed</span>
+              </div>
+              <div class="card-body">
+                <h3>Gotowy efekt premium</h3>
+                <p>Pełna stylizacja z gładkim kształtem, objętością i eleganckim wykończeniem.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <div class="container">
+        <a class="btn back-link" href="index.html">Wróć do strony głównej</a>
+      </div>
+    </main>
+  </body>
+</html>
