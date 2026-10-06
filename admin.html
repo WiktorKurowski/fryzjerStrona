@@ -687,6 +687,16 @@
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
 
+        function mergeReviewLists(localReviews, backendReviews) {
+          const localList = dedupeReviews(Array.isArray(localReviews) ? localReviews : []);
+          const backendList = dedupeReviews(Array.isArray(backendReviews) ? backendReviews : []);
+          const merged = dedupeReviews([...backendList, ...localList]);
+
+          if (merged.length) return merged;
+          if (backendList.length) return backendList;
+          return localList;
+        }
+
         async function fetchReviewsFromBackend() {
           try {
             const response = await fetch('/api/reviews', {
@@ -707,7 +717,7 @@
                   return [];
                 }
               })());
-              const next = dedupeReviews(data.length ? data : localList);
+              const next = mergeReviewLists(localList, data);
 
               if (data.length || localList.length) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -754,8 +764,12 @@
             const localList = raw ? dedupeReviews(JSON.parse(raw)) : [];
 
             const backendReviews = await fetchReviewsFromBackend();
-            if (Array.isArray(backendReviews) && backendReviews.length) {
-              return backendReviews;
+            const merged = mergeReviewLists(localList, Array.isArray(backendReviews) ? backendReviews : []);
+            if (merged.length) {
+              if (merged.length !== localList.length || (Array.isArray(backendReviews) && backendReviews.length)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+              }
+              return merged;
             }
 
             if (storage.getReviews && typeof storage.getReviews === 'function') {

@@ -107,6 +107,27 @@
     });
   }
 
+  function mergeReviewLists(localReviews, backendReviews) {
+    const localList = Array.isArray(localReviews) ? localReviews.filter(Boolean) : [];
+    const backendList = Array.isArray(backendReviews) ? backendReviews.filter(Boolean) : [];
+    const seen = new Set();
+
+    const merged = [...backendList, ...localList].filter((review) => {
+      if (!review || typeof review !== 'object') return false;
+      const key = review.id !== undefined && review.id !== null
+        ? `id:${String(review.id)}`
+        : `review:${String(review.email || '').trim().toLowerCase()}|${String(review.message || '').trim()}`;
+
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    if (merged.length) return merged;
+    if (backendList.length) return backendList;
+    return localList;
+  }
+
   async function hydrateFromBackend() {
     const endpoints = [
       { key: STORAGE_KEYS.SERVICES, path: '/api/services' },
@@ -119,9 +140,30 @@
     for (const entry of endpoints) {
       try {
         const data = await requestJson(entry.path, 'GET');
-        if (data !== null && data !== undefined) {
-          localStorage.setItem(entry.key, JSON.stringify(data));
+        if (data === null || data === undefined) {
+          continue;
         }
+
+        if (entry.key === STORAGE_KEYS.REVIEWS) {
+          const localReviews = readJson(STORAGE_KEYS.REVIEWS, []);
+          const merged = mergeReviewLists(localReviews, data);
+
+          if (Array.isArray(data) && data.length === 0 && Array.isArray(localReviews) && localReviews.length) {
+            continue;
+          }
+
+          localStorage.setItem(entry.key, JSON.stringify(merged));
+          continue;
+        }
+
+        if (Array.isArray(data)) {
+          const localData = readJson(entry.key, null);
+          if (data.length === 0 && Array.isArray(localData) && localData.length) {
+            continue;
+          }
+        }
+
+        localStorage.setItem(entry.key, JSON.stringify(data));
       } catch (error) {
         // Ignore backend errors and keep the local fallback data.
       }
@@ -132,7 +174,10 @@
     try {
       const result = await requestJson(path, method, payload);
       if (result !== null && result !== undefined) {
-        localStorage.setItem(key, JSON.stringify(result));
+        const nextValue = key === STORAGE_KEYS.REVIEWS
+          ? mergeReviewLists(readJson(STORAGE_KEYS.REVIEWS, []), result)
+          : result;
+        localStorage.setItem(key, JSON.stringify(nextValue));
       }
       return result;
     } catch (error) {

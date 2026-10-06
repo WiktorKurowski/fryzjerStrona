@@ -1667,6 +1667,40 @@
           });
         }
 
+        function mergeReviewLists(localReviews, backendReviews) {
+          const localList = Array.isArray(localReviews) ? localReviews.filter(Boolean) : [];
+          const backendList = Array.isArray(backendReviews) ? backendReviews.filter(Boolean) : [];
+          const merged = dedupeReviews([...backendList, ...localList]);
+
+          if (merged.length) return merged;
+          if (backendList.length) return backendList;
+          return localList;
+        }
+
+        async function syncReviewsToBackend(reviews) {
+          const payload = dedupeReviews(Array.isArray(reviews) ? reviews : []);
+
+          try {
+            const response = await fetch('/api/reviews', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+              return payload;
+            }
+
+            const result = await response.json().catch(() => payload);
+            return dedupeReviews(Array.isArray(result) ? result : payload);
+          } catch (error) {
+            return payload;
+          }
+        }
+
         function getServices() {
           try {
             const raw = localStorage.getItem(SERVICES_KEY);
@@ -2287,7 +2321,7 @@
 
         const form = document.getElementById('reviewForm');
         if (form) {
-          form.addEventListener('submit', function (event) {
+          form.addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const name = document.getElementById('reviewName').value.trim();
@@ -2328,6 +2362,7 @@
               const nextReviews = dedupeReviews([newReview, ...reviews]);
               try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(nextReviews));
+                await syncReviewsToBackend(nextReviews);
               } catch (error) {
                 console.error(error);
               }
@@ -2340,7 +2375,8 @@
             const nextReviews = dedupeReviews([newReview, ...reviews]);
 
             try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(nextReviews));
+              const savedReviews = await syncReviewsToBackend(nextReviews);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(savedReviews));
             } catch (error) {
               console.error(error);
               alert('Nie udało się zapisać opinii. Spróbuj ponownie.');
