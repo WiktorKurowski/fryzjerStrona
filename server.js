@@ -10,44 +10,21 @@ const DATA_FILE = path.join(DATA_DIR, 'store.json');
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'kurowska_admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Kurowska!Fryzjer2026#Admin';
 const adminSessions = new Map();
-const DEFAULT_REVIEWS = [
-  {
-    id: 1,
-    name: 'Anna',
-    surname: 'Kowalska',
-    surnameInitial: 'K',
-    email: 'anna@example.com',
-    rating: 5,
-    message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura idealnie dopasowana do twarzy i wygląda bardzo naturalnie.',
-    createdAt: new Date().toISOString(),
-    hidden: false,
-    status: 'visible'
-  },
-  {
-    id: 2,
-    name: 'Karolina',
-    surname: 'Malinowska',
-    surnameInitial: 'M',
-    email: 'karolina@example.com',
-    rating: 5,
-    message: 'Profesjonalna obsługa, bardzo przyjazna atmosfera i efekt końcowy naprawdę robi wrażenie. Polecam Kurowska Pracownia Fryzjerska.',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    hidden: false,
-    status: 'visible'
-  },
-  {
-    id: 3,
-    name: 'Ewa',
-    surname: 'Nowak',
-    surnameInitial: 'N',
-    email: 'ewa@example.com',
-    rating: 4,
-    message: 'Dobrze dobrane kolory i bardzo sympatyczna obsługa. Włosy wyglądają zdrowo i elegancko po wizycie w salonie.',
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    hidden: false,
-    status: 'visible'
+const DEFAULT_REVIEWS = [];
+const LEGACY_REVIEW_EMAILS = new Set(['anna@example.com', 'karolina@example.com', 'ewa@example.com']);
+
+function sanitizeReviews(reviews) {
+  if (!Array.isArray(reviews)) {
+    return [];
   }
-];
+
+  return reviews.filter((review) => {
+    const email = String(review && review.email ? review.email : '').trim().toLowerCase();
+    const message = String(review && review.message ? review.message : '');
+
+    return !(LEGACY_REVIEW_EMAILS.has(email) && message.includes('Kurowska Pracownia Fryzjerska'));
+  });
+}
 
 function generateSessionToken() {
   return crypto.randomBytes(32).toString('hex');
@@ -74,7 +51,7 @@ function ensureStore() {
       hours: [],
       holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
       appointments: [],
-      reviews: DEFAULT_REVIEWS
+      reviews: []
     }, null, 2));
     return;
   }
@@ -88,10 +65,17 @@ function ensureStore() {
         hours: Array.isArray(parsed?.hours) ? parsed.hours : [],
         holiday: parsed?.holiday || { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
         appointments: Array.isArray(parsed?.appointments) ? parsed.appointments : [],
-        reviews: DEFAULT_REVIEWS
+        reviews: []
       }, null, 2));
+      return;
+    }
+
+    const cleanedReviews = sanitizeReviews(parsed.reviews);
+    if (cleanedReviews.length !== parsed.reviews.length) {
+      parsed.reviews = cleanedReviews;
+      fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
     } else if (parsed.reviews.length === 0) {
-      parsed.reviews = DEFAULT_REVIEWS;
+      parsed.reviews = [];
       fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
     }
   } catch (error) {
@@ -100,7 +84,7 @@ function ensureStore() {
       hours: [],
       holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
       appointments: [],
-      reviews: DEFAULT_REVIEWS
+      reviews: []
     }, null, 2));
   }
 }
@@ -111,11 +95,17 @@ function readStore() {
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.reviews)) {
-      parsed.reviews = DEFAULT_REVIEWS;
+      parsed.reviews = [];
+      fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
+    }
+
+    const cleanedReviews = sanitizeReviews(parsed.reviews);
+    if (cleanedReviews.length !== parsed.reviews.length) {
+      parsed.reviews = cleanedReviews;
       fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
     }
     if (parsed.reviews.length === 0) {
-      parsed.reviews = DEFAULT_REVIEWS;
+      parsed.reviews = [];
       fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
     }
     return parsed;
@@ -125,7 +115,7 @@ function readStore() {
       hours: [],
       holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
       appointments: [],
-      reviews: DEFAULT_REVIEWS
+      reviews: []
     };
   }
 }

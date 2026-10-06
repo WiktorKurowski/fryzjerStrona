@@ -1700,20 +1700,19 @@
 
         function getReviews() {
           try {
-            const baseReviews = Array.isArray(defaultReviews) ? [...defaultReviews] : [];
             const raw = localStorage.getItem(STORAGE_KEY);
-
             if (!raw) {
-              if (baseReviews.length) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(baseReviews));
-              }
-              return [...baseReviews];
+              return [];
             }
 
             const parsed = JSON.parse(raw);
-            const savedReviews = Array.isArray(parsed) ? parsed : [];
-            const mergedReviews = [...baseReviews, ...savedReviews];
-            const uniqueReviews = mergedReviews.filter((review, index, arr) => {
+            const savedReviews = Array.isArray(parsed) ? parsed.filter((review) => {
+              const email = String(review && review.email ? review.email : '').trim().toLowerCase();
+              const message = String(review && review.message ? review.message : '');
+              return !(email === 'anna@example.com' || email === 'karolina@example.com' || email === 'ewa@example.com') || !message.includes('Kurowska Pracownia Fryzjerska');
+            }) : [];
+
+            const dedupedReviews = savedReviews.filter((review, index, arr) => {
               const key = review && review.id ? `id:${review.id}` : `email:${String(review?.email || '').toLowerCase()}|msg:${String(review?.message || '').trim()}`;
               return arr.findIndex((item) => {
                 const itemKey = item && item.id ? `id:${item.id}` : `email:${String(item?.email || '').toLowerCase()}|msg:${String(item?.message || '').trim()}`;
@@ -1721,13 +1720,13 @@
               }) === index;
             });
 
-            if (uniqueReviews.length) {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(uniqueReviews));
+            if (dedupedReviews.length !== savedReviews.length || dedupedReviews.length !== (Array.isArray(parsed) ? parsed.length : 0)) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(dedupedReviews));
             }
 
-            return uniqueReviews;
+            return dedupedReviews;
           } catch (error) {
-            return Array.isArray(defaultReviews) ? [...defaultReviews] : [];
+            return [];
           }
         }
 
