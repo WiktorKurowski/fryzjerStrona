@@ -680,8 +680,35 @@
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        function getReviews() {
+        async function fetchReviewsFromBackend() {
           try {
+            const response = await fetch('/api/reviews', {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json'
+              }
+            });
+
+            if (!response.ok) return null;
+            const data = await response.json();
+            if (Array.isArray(data)) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+              return data;
+            }
+          } catch (error) {
+            // Ignore backend fetch issues and fall back to local storage below.
+          }
+
+          return null;
+        }
+
+        async function getReviews() {
+          try {
+            const backendReviews = await fetchReviewsFromBackend();
+            if (Array.isArray(backendReviews) && backendReviews.length) {
+              return backendReviews;
+            }
+
             if (storage.getReviews && typeof storage.getReviews === 'function') {
               const reviews = storage.getReviews();
               if (Array.isArray(reviews) && reviews.length) return reviews;
@@ -1139,12 +1166,12 @@
           alert('Zapisano ceny usług.');
         }
 
-        function renderReviews() {
+        async function renderReviews() {
           const tbody = document.getElementById('adminReviews');
           if (!tbody) return;
 
           try {
-            const reviews = getReviews();
+            const reviews = await getReviews();
 
             if (!Array.isArray(reviews) || !reviews.length) {
               tbody.innerHTML = '<tr><td colspan="5">Brak opinii.</td></tr>';
@@ -1175,9 +1202,9 @@
             }).join('');
 
             document.querySelectorAll('.toggle-btn').forEach((button) => {
-              button.addEventListener('click', function () {
+              button.addEventListener('click', async function () {
                 const id = Number(this.dataset.id);
-                const current = getReviews();
+                const current = await getReviews();
                 const updated = current.map((review) => {
                   if (Number(review.id) !== id) return review;
                   const hidden = this.dataset.hidden === 'true' ? false : true;
@@ -1192,21 +1219,21 @@
                 } else {
                   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                 }
-                renderReviews();
+                await renderReviews();
               });
             });
 
             document.querySelectorAll('.delete-btn').forEach((button) => {
-              button.addEventListener('click', function () {
+              button.addEventListener('click', async function () {
                 const id = Number(this.dataset.id);
-                const current = getReviews();
+                const current = await getReviews();
                 const filtered = current.filter((review) => Number(review.id) !== id);
                 if (storage.saveReviews && typeof storage.saveReviews === 'function') {
                   storage.saveReviews(filtered);
                 } else {
                   localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
                 }
-                renderReviews();
+                await renderReviews();
               });
             });
           } catch (error) {
