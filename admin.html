@@ -1214,6 +1214,19 @@
           }
         }
 
+        async function refreshAdminData() {
+          if (window.KUROWSKA_STORAGE && typeof window.KUROWSKA_STORAGE.hydrateFromBackend === 'function') {
+            await window.KUROWSKA_STORAGE.hydrateFromBackend();
+          }
+
+          renderAppointmentOptions();
+          renderServiceEditor();
+          renderHoursEditor();
+          renderHolidayEditor();
+          renderAppointments();
+          renderReviews();
+        }
+
         async function login() {
           const user = document.getElementById('loginUser').value.trim();
           const pass = document.getElementById('loginPassword').value.trim();
@@ -1238,12 +1251,7 @@
             loginBox.style.display = 'none';
             adminArea.classList.add('visible');
             logoutBtn.style.display = 'inline-block';
-            renderAppointmentOptions();
-            renderServiceEditor();
-            renderHoursEditor();
-            renderHolidayEditor();
-            renderAppointments();
-            renderReviews();
+            await refreshAdminData();
             loginError.classList.remove('visible');
           } catch (error) {
             sessionStorage.removeItem('kurowska_admin_logged');
@@ -1305,13 +1313,7 @@
           loginBox.style.display = 'none';
           adminArea.classList.add('visible');
           logoutBtn.style.display = 'inline-block';
-          renderAppointmentOptions();
-          renderServiceEditor();
-          renderHoursEditor();
-          renderHolidayEditor();
-          renderAppointments();
-          renderDayAvailability();
-          renderReviews();
+          refreshAdminData().then(() => renderDayAvailability());
         }
       })();
     </script>
