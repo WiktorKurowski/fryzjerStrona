@@ -361,6 +361,10 @@
         border-color: rgba(180, 104, 79, 0.32);
       }
 
+      .service-link {
+        color: inherit;
+      }
+
       .service-name {
         font-weight: 700;
         font-size: 1.05rem;
@@ -494,8 +498,8 @@
       .review-cta {
         background: linear-gradient(135deg, #f5e8e0, #fdf7f3);
         border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 22px 20px;
+        border-radius: 24px;
+        padding: 28px 22px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -504,6 +508,89 @@
       .review-cta p {
         margin: 0 0 16px;
         color: var(--muted);
+      }
+
+      .review-form {
+        margin-top: 10px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .review-form input,
+      .review-form textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        background: #fff;
+        color: var(--text);
+      }
+
+      .review-form textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .review-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .review-panel {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        margin-top: 28px;
+      }
+
+      .reviews-list {
+        display: grid;
+        gap: 18px;
+      }
+
+      .review-item {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 20px 18px;
+      }
+
+      .review-item .stars {
+        margin-bottom: 10px;
+      }
+
+      .review-item p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      .review-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        font-size: 0.9rem;
+        color: var(--primary);
+      }
+
+      .review-author {
+        font-weight: 700;
+      }
+
+      .review-success {
+        margin-top: 12px;
+        border-radius: 12px;
+        background: rgba(34, 139, 34, 0.08);
+        color: #1f5b32;
+        padding: 12px 14px;
+        font-weight: 700;
+        display: none;
+      }
+
+      .review-success.visible {
+        display: block;
       }
 
       .contact-list {
@@ -695,7 +782,7 @@
 
           <div class="stats">
             <div class="stat">
-              <strong>10+</strong>
+              <strong>25+</strong>
               <span>lat doświadczenia</span>
             </div>
             <div class="stat">
@@ -763,71 +850,7 @@
             <p>Wybierz usługę, która najlepiej spełni Twoje oczekiwania.</p>
           </div>
 
-          <div class="price-grid">
-            <div class="price-item">
-              <div>
-                <span class="service-name">Strzyżenie męskie</span>
-                <span class="service-desc">Krótkie i klasyczne cięcia</span>
-              </div>
-              <span class="service-price">od 50 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Strzyżenie damskie</span>
-                <span class="service-desc">Fryzura na miarę, z cięciem i modelowaniem</span>
-              </div>
-              <span class="service-price">od 80 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Mycie włosów</span>
-                <span class="service-desc">Delikatne oczyszczanie i masaż skóry głowy</span>
-              </div>
-              <span class="service-price">od 30 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Modelowanie włosów</span>
-                <span class="service-desc">Stylizacja na co dzień i na specjalne okazje</span>
-              </div>
-              <span class="service-price">od 70 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Koloryzacja</span>
-                <span class="service-desc">Pełna lub częściowa, tonowanie i korekta koloru</span>
-              </div>
-              <span class="service-price">od 180 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Balayage / ombre</span>
-                <span class="service-desc">Naturalne przejścia kolorystyczne</span>
-              </div>
-              <span class="service-price">od 260 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Regeneracja włosów</span>
-                <span class="service-desc">Maska, odbudowa i nawilżenie</span>
-              </div>
-              <span class="service-price">od 120 zł</span>
-            </div>
-
-            <div class="price-item">
-              <div>
-                <span class="service-name">Keratynizacja / prostowanie</span>
-                <span class="service-desc">Gładkie i lśniące włosy na dłużej</span>
-              </div>
-              <span class="service-price">od 250 zł</span>
-            </div>
-          </div>
+          <div class="price-grid" id="priceGrid"></div>
         </div>
       </section>
 
@@ -881,22 +904,21 @@
             <p>Kurowska Pracownia Fryzjerska zyskuje uznanie dzięki profesjonalnej opiece i efektom, które zostają na długo.</p>
           </div>
 
-          <div class="reviews-grid">
-            <div class="review-box">
-              <div class="stars">★★★★★</div>
-              <p>„Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura dopasowana do mojej twarzy, a efekt był naprawdę naturalny i elegancki.”</p>
-              <strong>Anna K.</strong>
-            </div>
-
-            <div class="review-box">
-              <div class="stars">★★★★★</div>
-              <p>„Doskonała obsługa, profesjonalne podejście i bardzo przyjemna atmosfera. Polecam każdemu, kto szuka stylowej fryzury.”</p>
-              <strong>Karolina M.</strong>
-            </div>
+          <div class="review-panel">
+            <div class="reviews-list" id="reviews-list"></div>
 
             <div class="review-cta">
-              <p>Masz swoją opinię o Kurowska Pracownia Fryzjerska? Dodaj ją na Google i pomóż innym wybrać sprawdzone miejsce.</p>
-              <a class="btn" href="https://www.google.com/search?q=Kurowska+Pracownia+Fryzjerska" target="_blank" rel="noreferrer">Dodaj opinię na Google</a>
+              <p>Masz swoją opinię o Kurowska Pracownia Fryzjerska? Dodaj ją i pomóż innym wybrać sprawdzone miejsce.</p>
+              <form class="review-form" id="reviewForm">
+                <div class="review-form-row">
+                  <input type="text" id="reviewName" placeholder="Imię" aria-label="Imię" required />
+                  <input type="text" id="reviewSurnameInitial" placeholder="Pierwsza litera nazwiska" aria-label="Pierwsza litera nazwiska" maxlength="1" required />
+                </div>
+                <input type="email" id="reviewEmail" placeholder="Adres e-mail" aria-label="Adres e-mail" required />
+                <textarea id="reviewText" placeholder="Napisz opinię..." aria-label="Napisz opinię" required></textarea>
+                <button type="submit" class="btn">Dodaj opinię</button>
+              </form>
+              <div class="review-success" id="reviewSuccess">Dziękujemy! Twoja opinia została zapisana.</div>
             </div>
           </div>
         </div>
@@ -951,8 +973,249 @@
     <footer>
       <div class="container footer-row">
         <p>© 2025 Kurowska Pracownia Fryzjerska. Wszystkie prawa zastrzeżone.</p>
-        <p>Fryzjer mobilny</p>
       </div>
     </footer>
+
+    <script>
+      (function () {
+        const STORAGE_KEY = 'kurowska_pracownia_opinie';
+        const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const defaultServices = [
+          {
+            slug: 'strzyzenie-meskie',
+            name: 'Strzyżenie męskie',
+            description: 'Krótkie i klasyczne cięcia',
+            startingPrice: 50,
+            prices: [
+              { label: 'Krótkie', value: 50 },
+              { label: 'Średnie', value: 70 },
+              { label: 'Długie', value: 90 }
+            ]
+          },
+          {
+            slug: 'strzyzenie-damskie',
+            name: 'Strzyżenie damskie',
+            description: 'Fryzura na miarę, z cięciem i modelowaniem',
+            startingPrice: 80,
+            prices: [
+              { label: 'Do ramion', value: 80 },
+              { label: 'Do łopatek', value: 120 },
+              { label: 'Długie', value: 170 }
+            ]
+          },
+          {
+            slug: 'mycie-wlosow',
+            name: 'Mycie włosów',
+            description: 'Delikatne oczyszczanie i masaż skóry głowy',
+            startingPrice: 30,
+            prices: [
+              { label: 'Krótko', value: 30 },
+              { label: 'Średnio', value: 40 },
+              { label: 'Długo', value: 55 }
+            ]
+          },
+          {
+            slug: 'modelowanie-wlosow',
+            name: 'Modelowanie włosów',
+            description: 'Stylizacja na co dzień i na specjalne okazje',
+            startingPrice: 70,
+            prices: [
+              { label: 'Krótko', value: 70 },
+              { label: 'Średnio', value: 95 },
+              { label: 'Długo', value: 130 }
+            ]
+          },
+          {
+            slug: 'koloryzacja',
+            name: 'Koloryzacja',
+            description: 'Pełna lub częściowa, tonowanie i korekta koloru',
+            startingPrice: 180,
+            prices: [
+              { label: 'Korzenie', value: 180 },
+              { label: 'Połowa głowy', value: 230 },
+              { label: 'Pełna', value: 320 }
+            ]
+          },
+          {
+            slug: 'balayage-ombre',
+            name: 'Balayage / ombre',
+            description: 'Naturalne przejścia kolorystyczne',
+            startingPrice: 260,
+            prices: [
+              { label: 'Krótko', value: 260 },
+              { label: 'Średnio', value: 330 },
+              { label: 'Długo', value: 420 }
+            ]
+          },
+          {
+            slug: 'regeneracja-wlosow',
+            name: 'Regeneracja włosów',
+            description: 'Maska, odbudowa i nawilżenie',
+            startingPrice: 120,
+            prices: [
+              { label: 'Krótko', value: 120 },
+              { label: 'Średnio', value: 150 },
+              { label: 'Długo', value: 190 }
+            ]
+          },
+          {
+            slug: 'keratynizacja-prostowanie',
+            name: 'Keratynizacja / prostowanie',
+            description: 'Gładkie i lśniące włosy na dłużej',
+            startingPrice: 250,
+            prices: [
+              { label: 'Krótko', value: 250 },
+              { label: 'Średnio', value: 320 },
+              { label: 'Długo', value: 390 }
+            ]
+          }
+        ];
+
+        const defaultReviews = [
+          {
+            id: 1,
+            name: 'Anna',
+            surnameInitial: 'K',
+            email: 'anna@example.com',
+            message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura dopasowana do mojej twarzy, a efekt był naprawdę naturalny i elegancki.',
+            createdAt: '2026-10-01T12:00:00.000Z'
+          },
+          {
+            id: 2,
+            name: 'Karolina',
+            surnameInitial: 'M',
+            email: 'karolina@example.com',
+            message: 'Doskonała obsługa, profesjonalne podejście i bardzo przyjemna atmosfera. Polecam każdemu, kto szuka stylowej fryzury.',
+            createdAt: '2026-09-15T10:30:00.000Z'
+          }
+        ];
+
+        function getServices() {
+          try {
+            const raw = localStorage.getItem(SERVICES_KEY);
+            if (!raw) {
+              localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              return [...defaultServices];
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) && parsed.length ? parsed : [...defaultServices];
+          } catch (error) {
+            return [...defaultServices];
+          }
+        }
+
+        function getReviews() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReviews));
+              return defaultReviews;
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) && parsed.length ? parsed : defaultReviews;
+          } catch (error) {
+            return defaultReviews;
+          }
+        }
+
+        function renderServices() {
+          const grid = document.getElementById('priceGrid');
+          if (!grid) return;
+
+          const services = getServices();
+          grid.innerHTML = services.map((service) => {
+            const name = service.name || 'Usługa';
+            const description = service.description || 'Sprawdź szczegóły';
+            const startingPrice = Number(service.startingPrice) || 0;
+            const priceText = startingPrice ? `od ${startingPrice} zł` : 'Sprawdź cenę';
+
+            return `
+              <a class="price-item service-link" href="usluga.html?slug=${encodeURIComponent(service.slug || name.toLowerCase())}">
+                <div>
+                  <span class="service-name">${name}</span>
+                  <span class="service-desc">${description}</span>
+                </div>
+                <span class="service-price">${priceText}</span>
+              </a>
+            `;
+          }).join('');
+        }
+
+        function renderReviews() {
+          const list = document.getElementById('reviews-list');
+          if (!list) return;
+
+          const reviews = getReviews();
+          list.innerHTML = reviews.map((review) => {
+            const author = `${review.name} ${review.surnameInitial}.`;
+            const date = review.createdAt ? new Date(review.createdAt).toLocaleDateString('pl-PL', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }) : '';
+
+            return `
+              <article class="review-item">
+                <div class="stars">★★★★★</div>
+                <p>“${review.message}”</p>
+                <div class="review-meta">
+                  <span class="review-author">${author}</span>
+                  <span>${date}</span>
+                </div>
+              </article>
+            `;
+          }).join('');
+        }
+
+        const form = document.getElementById('reviewForm');
+        if (form) {
+          form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById('reviewName').value.trim();
+            const surnameInitial = document.getElementById('reviewSurnameInitial').value.trim().slice(0, 1).toUpperCase();
+            const email = document.getElementById('reviewEmail').value.trim();
+            const message = document.getElementById('reviewText').value.trim();
+
+            if (!name || !surnameInitial || !email || !message) {
+              alert('Wypełnij wszystkie pola formularza.');
+              return;
+            }
+
+            const newReview = {
+              id: Date.now(),
+              name,
+              surnameInitial,
+              email,
+              message,
+              createdAt: new Date().toISOString()
+            };
+
+            const reviews = getReviews();
+            reviews.unshift(newReview);
+
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+            } catch (error) {
+              console.error(error);
+              alert('Nie udało się zapisać opinii. Spróbuj ponownie.');
+              return;
+            }
+
+            form.reset();
+            renderReviews();
+
+            const successBox = document.getElementById('reviewSuccess');
+            if (successBox) {
+              successBox.classList.add('visible');
+              setTimeout(() => successBox.classList.remove('visible'), 2500);
+            }
+          });
+        }
+
+        renderServices();
+        renderReviews();
+      })();
+    </script>
   </body>
 </html>

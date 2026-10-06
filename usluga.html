@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usługa | Kurowska Pracownia Fryzjerska</title>
+    <style>
+      :root {
+        --bg: #fff7f2;
+        --bg-soft: #fbece5;
+        --card: #fffdfb;
+        --primary: #1f1a1a;
+        --secondary: #b4684f;
+        --secondary-strong: #8d4735;
+        --accent: #f4d2bf;
+        --text: #2a2525;
+        --muted: #6f5f5b;
+        --line: #f0dfd8;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, var(--bg) 0%, #fffaf8 100%);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      a { text-decoration: none; color: inherit; }
+      img { max-width: 100%; display: block; }
+      .container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+
+      .topbar {
+        background: linear-gradient(90deg, #1f1b1b 0%, #342d2b 100%);
+        color: #fff;
+        font-size: 0.9rem;
+      }
+      .topbar-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 10px 0;
+      }
+
+      header {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 78px;
+      }
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .logo span { color: var(--secondary); }
+      .nav-links {
+        display: flex;
+        gap: 24px;
+        font-weight: 600;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-strong) 100%);
+        color: #fff;
+        padding: 16px 28px;
+        border-radius: 999px;
+        font-weight: 700;
+        box-shadow: 0 14px 28px rgba(180, 104, 79, 0.25);
+      }
+
+      .page {
+        padding: 56px 0 100px;
+      }
+      .service-header {
+        display: grid;
+        gap: 18px;
+        margin-bottom: 32px;
+      }
+      .eyebrow {
+        color: var(--secondary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 5vw, 3.4rem);
+        letter-spacing: -0.05em;
+      }
+      .intro {
+        color: var(--muted);
+        max-width: 760px;
+        margin: 0;
+      }
+
+      .service-card {
+        background: linear-gradient(180deg, #fff 0%, #fffaf8 100%);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 28px;
+        box-shadow: 0 18px 35px rgba(50, 35, 29, 0.07);
+      }
+
+      .price-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+      .price-row strong {
+        font-size: 1.1rem;
+        color: var(--secondary);
+      }
+
+      .cta-row {
+        margin-top: 26px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
+
+      footer {
+        background: linear-gradient(90deg, #1f1b1b 0%, #342d2b 100%);
+        color: rgba(255,255,255,0.8);
+        padding: 18px 0;
+      }
+      .footer-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 640px) {
+        .nav {
+          flex-direction: column;
+          justify-content: center;
+          gap: 12px;
+          padding: 16px 0;
+        }
+        .nav-links {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .service-card {
+          padding: 18px;
+        }
+        .price-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <span>Fryzjer mobilny — salon w nowoczesnym wydaniu</span>
+        <span class="phone">502 081 223</span>
+      </div>
+    </div>
+
+    <header>
+      <div class="container nav">
+        <a href="index.html" class="logo">Kurowska <span>Pracownia</span></a>
+        <nav class="nav-links">
+          <a href="index.html#uslugi">Cennik</a>
+          <a href="index.html#realizacje">Realizacje</a>
+          <a href="index.html#opinie">Opinie</a>
+          <a href="index.html#kontakt">Kontakt</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="container">
+        <div class="service-header">
+          <span class="eyebrow">Usługa</span>
+          <h1 id="serviceTitle">Ładowanie...</h1>
+          <p class="intro" id="serviceIntro">Przygotowujemy szczegółową ofertę dla wybranej usługi.</p>
+        </div>
+
+        <div class="service-card">
+          <div class="price-list" id="priceList"></div>
+          <div class="cta-row">
+            <a class="btn" href="index.html#kontakt">Umów wizytę</a>
+            <a class="btn" href="index.html#uslugi" style="background: transparent; border: 1px solid var(--line); color: var(--text); box-shadow: none;">Wróć do cennika</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container footer-row">
+        <p>© 2025 Kurowska Pracownia Fryzjerska</p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const defaultServices = [
+          {
+            slug: 'strzyzenie-meskie',
+            name: 'Strzyżenie męskie',
+            description: 'Krótkie i klasyczne cięcia',
+            startingPrice: 50,
+            prices: [
+              { label: 'Krótkie', value: 50 },
+              { label: 'Średnie', value: 70 },
+              { label: 'Długie', value: 90 }
+            ]
+          },
+          {
+            slug: 'strzyzenie-damskie',
+            name: 'Strzyżenie damskie',
+            description: 'Fryzura na miarę, z cięciem i modelowaniem',
+            startingPrice: 80,
+            prices: [
+              { label: 'Do ramion', value: 80 },
+              { label: 'Do łopatek', value: 120 },
+              { label: 'Długie', value: 170 }
+            ]
+          },
+          {
+            slug: 'mycie-wlosow',
+            name: 'Mycie włosów',
+            description: 'Delikatne oczyszczanie i masaż skóry głowy',
+            startingPrice: 30,
+            prices: [
+              { label: 'Krótko', value: 30 },
+              { label: 'Średnio', value: 40 },
+              { label: 'Długo', value: 55 }
+            ]
+          },
+          {
+            slug: 'modelowanie-wlosow',
+            name: 'Modelowanie włosów',
+            description: 'Stylizacja na co dzień i na specjalne okazje',
+            startingPrice: 70,
+            prices: [
+              { label: 'Krótko', value: 70 },
+              { label: 'Średnio', value: 95 },
+              { label: 'Długo', value: 130 }
+            ]
+          },
+          {
+            slug: 'koloryzacja',
+            name: 'Koloryzacja',
+            description: 'Pełna lub częściowa, tonowanie i korekta koloru',
+            startingPrice: 180,
+            prices: [
+              { label: 'Korzenie', value: 180 },
+              { label: 'Połowa głowy', value: 230 },
+              { label: 'Pełna', value: 320 }
+            ]
+          },
+          {
+            slug: 'balayage-ombre',
+            name: 'Balayage / ombre',
+            description: 'Naturalne przejścia kolorystyczne',
+            startingPrice: 260,
+            prices: [
+              { label: 'Krótko', value: 260 },
+              { label: 'Średnio', value: 330 },
+              { label: 'Długo', value: 420 }
+            ]
+          },
+          {
+            slug: 'regeneracja-wlosow',
+            name: 'Regeneracja włosów',
+            description: 'Maska, odbudowa i nawilżenie',
+            startingPrice: 120,
+            prices: [
+              { label: 'Krótko', value: 120 },
+              { label: 'Średnio', value: 150 },
+              { label: 'Długo', value: 190 }
+            ]
+          },
+          {
+            slug: 'keratynizacja-prostowanie',
+            name: 'Keratynizacja / prostowanie',
+            description: 'Gładkie i lśniące włosy na dłużej',
+            startingPrice: 250,
+            prices: [
+              { label: 'Krótko', value: 250 },
+              { label: 'Średnio', value: 320 },
+              { label: 'Długo', value: 390 }
+            ]
+          }
+        ];
+
+        function getServices() {
+          try {
+            const raw = localStorage.getItem(SERVICES_KEY);
+            if (!raw) {
+              localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              return [...defaultServices];
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) && parsed.length ? parsed : [...defaultServices];
+          } catch (error) {
+            return [...defaultServices];
+          }
+        }
+
+        function renderService() {
+          const params = new URLSearchParams(window.location.search);
+          const slug = params.get('slug');
+          const services = getServices();
+          const service = services.find((item) => item.slug === slug) || services[0];
+          const title = document.getElementById('serviceTitle');
+          const intro = document.getElementById('serviceIntro');
+          const priceList = document.getElementById('priceList');
+
+          if (!service) {
+            title.textContent = 'Brak usługi';
+            intro.textContent = 'Nie znaleziono szczegółów tej usługi.';
+            return;
+          }
+
+          title.textContent = service.name;
+          intro.textContent = service.description || 'Szczegółowa oferta dla wybranej usługi.';
+          document.title = `${service.name} | Kurowska Pracownia Fryzjerska`;
+
+          const prices = Array.isArray(service.prices) && service.prices.length ? service.prices : [{ label: 'Cena', value: Number(service.startingPrice) || 0 }];
+
+          priceList.innerHTML = prices.map((item) => `
+            <div class="price-row">
+              <span>${item.label || 'Cena'}</span>
+              <strong>${Number(item.value) || 0} zł</strong>
+            </div>
+          `).join('');
+        }
+
+        renderService();
+      })();
+    </script>
+  </body>
+</html>

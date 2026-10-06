@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel admin | Kurowska Pracownia Fryzjerska</title>
+    <style>
+      :root {
+        --bg: #fff7f2;
+        --card: #fffdfb;
+        --primary: #1f1a1a;
+        --secondary: #b4684f;
+        --secondary-strong: #8d4735;
+        --text: #2a2525;
+        --muted: #6f5f5b;
+        --line: #f0dfd8;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, #fff7f2 0%, #fffaf8 100%);
+        color: var(--text);
+      }
+
+      a { text-decoration: none; color: inherit; }
+      .container {
+        width: min(1100px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        background: linear-gradient(90deg, #1f1b1b 0%, #342d2b 100%);
+        color: #fff;
+        padding: 16px 0;
+      }
+
+      .topbar-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .panel {
+        padding: 60px 0 90px;
+      }
+
+      .panel-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 18px 30px rgba(33, 21, 17, 0.06);
+      }
+
+      .login-box {
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      h1, h2, h3 {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      p {
+        margin: 0 0 18px;
+        color: var(--muted);
+      }
+
+      .login-form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .login-form input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-strong) 100%);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 14px 22px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .admin-area {
+        display: none;
+      }
+
+      .admin-area.visible {
+        display: block;
+      }
+
+      .admin-grid {
+        display: grid;
+        gap: 28px;
+      }
+
+      .admin-block {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+      }
+
+      .admin-block h2 {
+        margin-bottom: 18px;
+      }
+
+      .service-editor-list {
+        display: grid;
+        gap: 18px;
+      }
+
+      .service-editor-card {
+        background: #fffaf7;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .service-editor-card h3 {
+        margin-bottom: 12px;
+      }
+
+      .input-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .service-editor-card input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .price-editor-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .price-row {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 10px;
+      }
+
+      .save-pricing-btn {
+        margin-top: 18px;
+      }
+
+      .review-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 22px;
+      }
+
+      .review-table th,
+      .review-table td {
+        text-align: left;
+        vertical-align: top;
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .review-table th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .review-table .delete-btn {
+        background: #b74d3d;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .logout-btn {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.25);
+        color: #fff;
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .error {
+        display: none;
+        background: rgba(183, 77, 61, 0.08);
+        color: #7d3027;
+        border: 1px solid rgba(183, 77, 61, 0.2);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-top: 12px;
+        font-weight: 700;
+      }
+
+      .error.visible {
+        display: block;
+      }
+
+      @media (max-width: 680px) {
+        .input-grid,
+        .price-row {
+          grid-template-columns: 1fr;
+        }
+
+        .review-table,
+        .review-table tbody,
+        .review-table tr,
+        .review-table td,
+        .review-table th {
+          display: block;
+          width: 100%;
+        }
+
+        .review-table thead {
+          display: none;
+        }
+
+        .review-table tr {
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          margin-bottom: 16px;
+          padding: 10px;
+          background: #fff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <strong>Panel admin</strong>
+        <button class="logout-btn" id="logoutBtn" type="button" style="display:none;">Wyloguj</button>
+      </div>
+    </div>
+
+    <main class="panel">
+      <div class="container">
+        <div class="panel-card">
+          <div id="loginBox" class="login-box">
+            <h1>Logowanie</h1>
+            <p>Zaloguj się, aby zarządzać cenami i opiniami klientów.</p>
+
+            <form class="login-form" id="loginForm">
+              <input type="text" id="loginUser" placeholder="Login" required />
+              <input type="password" id="loginPassword" placeholder="Hasło" required />
+              <button type="submit" class="btn">Zaloguj</button>
+            </form>
+
+            <div class="error" id="loginError">Niepoprawny login lub hasło.</div>
+          </div>
+
+          <div id="adminArea" class="admin-area">
+            <div class="admin-grid">
+              <section class="admin-block">
+                <h2>Cennik usług</h2>
+                <div id="serviceEditor"></div>
+                <button type="button" class="btn save-pricing-btn" id="savePricingBtn">Zapisz ceny</button>
+              </section>
+
+              <section class="admin-block">
+                <h2>Opinie klientów</h2>
+                <table class="review-table">
+                  <thead>
+                    <tr>
+                      <th>Autor</th>
+                      <th>Opinia</th>
+                      <th>Email</th>
+                      <th>Data</th>
+                      <th>Akcja</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminReviews"></tbody>
+                </table>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        const STORAGE_KEY = 'kurowska_pracownia_opinie';
+        const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const ADMIN_LOGIN = 'admin';
+        const ADMIN_PASSWORD = 'kurowska2025';
+
+        const defaultServices = [
+          {
+            slug: 'strzyzenie-meskie',
+            name: 'Strzyżenie męskie',
+            description: 'Krótkie i klasyczne cięcia',
+            startingPrice: 50,
+            prices: [
+              { label: 'Krótkie', value: 50 },
+              { label: 'Średnie', value: 70 },
+              { label: 'Długie', value: 90 }
+            ]
+          },
+          {
+            slug: 'strzyzenie-damskie',
+            name: 'Strzyżenie damskie',
+            description: 'Fryzura na miarę, z cięciem i modelowaniem',
+            startingPrice: 80,
+            prices: [
+              { label: 'Do ramion', value: 80 },
+              { label: 'Do łopatek', value: 120 },
+              { label: 'Długie', value: 170 }
+            ]
+          },
+          {
+            slug: 'mycie-wlosow',
+            name: 'Mycie włosów',
+            description: 'Delikatne oczyszczanie i masaż skóry głowy',
+            startingPrice: 30,
+            prices: [
+              { label: 'Krótko', value: 30 },
+              { label: 'Średnio', value: 40 },
+              { label: 'Długo', value: 55 }
+            ]
+          },
+          {
+            slug: 'modelowanie-wlosow',
+            name: 'Modelowanie włosów',
+            description: 'Stylizacja na co dzień i na specjalne okazje',
+            startingPrice: 70,
+            prices: [
+              { label: 'Krótko', value: 70 },
+              { label: 'Średnio', value: 95 },
+              { label: 'Długo', value: 130 }
+            ]
+          },
+          {
+            slug: 'koloryzacja',
+            name: 'Koloryzacja',
+            description: 'Pełna lub częściowa, tonowanie i korekta koloru',
+            startingPrice: 180,
+            prices: [
+              { label: 'Korzenie', value: 180 },
+              { label: 'Połowa głowy', value: 230 },
+              { label: 'Pełna', value: 320 }
+            ]
+          },
+          {
+            slug: 'balayage-ombre',
+            name: 'Balayage / ombre',
+            description: 'Naturalne przejścia kolorystyczne',
+            startingPrice: 260,
+            prices: [
+              { label: 'Krótko', value: 260 },
+              { label: 'Średnio', value: 330 },
+              { label: 'Długo', value: 420 }
+            ]
+          },
+          {
+            slug: 'regeneracja-wlosow',
+            name: 'Regeneracja włosów',
+            description: 'Maska, odbudowa i nawilżenie',
+            startingPrice: 120,
+            prices: [
+              { label: 'Krótko', value: 120 },
+              { label: 'Średnio', value: 150 },
+              { label: 'Długo', value: 190 }
+            ]
+          },
+          {
+            slug: 'keratynizacja-prostowanie',
+            name: 'Keratynizacja / prostowanie',
+            description: 'Gładkie i lśniące włosy na dłużej',
+            startingPrice: 250,
+            prices: [
+              { label: 'Krótko', value: 250 },
+              { label: 'Średnio', value: 320 },
+              { label: 'Długo', value: 390 }
+            ]
+          }
+        ];
+
+        const loginBox = document.getElementById('loginBox');
+        const adminArea = document.getElementById('adminArea');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        function getServices() {
+          try {
+            const raw = localStorage.getItem(SERVICES_KEY);
+            if (!raw) {
+              localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              return [...defaultServices];
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) && parsed.length ? parsed : [...defaultServices];
+          } catch (error) {
+            return [...defaultServices];
+          }
+        }
+
+        function isLoggedIn() {
+          return sessionStorage.getItem('kurowska_admin_logged') === 'true';
+        }
+
+        function renderServiceEditor() {
+          const container = document.getElementById('serviceEditor');
+          if (!container) return;
+
+          const services = getServices();
+          container.innerHTML = services.map((service, index) => {
+            const prices = Array.isArray(service.prices) && service.prices.length ? service.prices : [
+              { label: 'Cena', value: Number(service.startingPrice) || 0 }
+            ];
+
+            return `
+              <div class="service-editor-card" data-index="${index}" data-slug="${service.slug}">
+                <h3>${index + 1}. ${service.name || 'Usługa'}</h3>
+                <div class="input-grid">
+                  <input data-field="name" value="${(service.name || '').replace(/"/g, '&quot;')}" placeholder="Nazwa usługi" />
+                  <input data-field="startingPrice" type="number" min="0" value="${Number(service.startingPrice) || 0}" placeholder="Cena bazowa" />
+                </div>
+                <div class="input-grid">
+                  <input data-field="description" value="${(service.description || '').replace(/"/g, '&quot;')}" placeholder="Krótki opis" />
+                  <input data-field="slug" value="${(service.slug || '').replace(/"/g, '&quot;')}" placeholder="Slug" />
+                </div>
+                <div class="price-editor-list">
+                  ${prices.map((price, priceIndex) => `
+                    <div class="price-row">
+                      <input data-field="price-label" value="${(price.label || '').replace(/"/g, '&quot;')}" placeholder="Długość / wariant" />
+                      <input data-field="price-value" type="number" min="0" value="${Number(price.value) || 0}" placeholder="Cena" />
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        function saveServices() {
+          const serviceCards = document.querySelectorAll('.service-editor-card');
+          const nextServices = Array.from(serviceCards).map((card) => {
+            const name = card.querySelector('[data-field="name"]').value.trim();
+            const description = card.querySelector('[data-field="description"]').value.trim();
+            const startingPrice = Number(card.querySelector('[data-field="startingPrice"]').value) || 0;
+            const slug = (card.querySelector('[data-field="slug"]').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-|-$/g, '');
+            const rows = Array.from(card.querySelectorAll('.price-row'));
+            const prices = rows.map((row) => {
+              const label = row.querySelector('[data-field="price-label"]').value.trim() || 'Cena';
+              const value = Number(row.querySelector('[data-field="price-value"]').value) || 0;
+              return { label, value };
+            });
+
+            return { slug, name, description, startingPrice, prices };
+          });
+
+          localStorage.setItem(SERVICES_KEY, JSON.stringify(nextServices));
+          renderServiceEditor();
+          alert('Zapisano ceny usług.');
+        }
+
+        function renderReviews() {
+          const tbody = document.getElementById('adminReviews');
+          if (!tbody) return;
+
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const reviews = raw ? JSON.parse(raw) : [];
+
+            if (!Array.isArray(reviews) || !reviews.length) {
+              tbody.innerHTML = '<tr><td colspan="5">Brak opinii.</td></tr>';
+              return;
+            }
+
+            tbody.innerHTML = reviews.map((review) => {
+              const author = `${review.name} ${review.surnameInitial || ''}.`;
+              const date = review.createdAt ? new Date(review.createdAt).toLocaleDateString('pl-PL') : '—';
+
+              return `
+                <tr>
+                  <td>${author}</td>
+                  <td>${review.message || ''}</td>
+                  <td>${review.email || ''}</td>
+                  <td>${date}</td>
+                  <td><button class="delete-btn" data-id="${review.id}">Usuń</button></td>
+                </tr>
+              `;
+            }).join('');
+
+            document.querySelectorAll('.delete-btn').forEach((button) => {
+              button.addEventListener('click', function () {
+                const id = Number(this.dataset.id);
+                const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                const filtered = current.filter((review) => Number(review.id) !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+                renderReviews();
+              });
+            });
+          } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="5">Błąd odczytu opinii.</td></tr>';
+          }
+        }
+
+        function login() {
+          const user = document.getElementById('loginUser').value.trim();
+          const pass = document.getElementById('loginPassword').value.trim();
+
+          if (user === ADMIN_LOGIN && pass === ADMIN_PASSWORD) {
+            sessionStorage.setItem('kurowska_admin_logged', 'true');
+            loginBox.style.display = 'none';
+            adminArea.classList.add('visible');
+            logoutBtn.style.display = 'inline-block';
+            renderServiceEditor();
+            renderReviews();
+          } else {
+            loginError.classList.add('visible');
+          }
+        }
+
+        function logout() {
+          sessionStorage.removeItem('kurowska_admin_logged');
+          loginBox.style.display = 'block';
+          adminArea.classList.remove('visible');
+          logoutBtn.style.display = 'none';
+          loginError.classList.remove('visible');
+          loginForm.reset();
+        }
+
+        loginForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          login();
+        });
+
+        logoutBtn.addEventListener('click', logout);
+        document.getElementById('savePricingBtn').addEventListener('click', saveServices);
+
+        if (isLoggedIn()) {
+          loginBox.style.display = 'none';
+          adminArea.classList.add('visible');
+          logoutBtn.style.display = 'inline-block';
+          renderServiceEditor();
+          renderReviews();
+        }
+      })();
+    </script>
+  </body>
+</html>
