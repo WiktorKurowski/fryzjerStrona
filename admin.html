@@ -699,9 +699,21 @@
             if (!response.ok) return null;
             const data = await response.json();
             if (Array.isArray(data)) {
-              const deduped = dedupeReviews(data);
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
-              return deduped;
+              const localList = dedupeReviews((() => {
+                try {
+                  const raw = localStorage.getItem(STORAGE_KEY);
+                  return raw ? JSON.parse(raw) : [];
+                } catch (error) {
+                  return [];
+                }
+              })());
+              const next = dedupeReviews(data.length ? data : localList);
+
+              if (data.length || localList.length) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+              }
+
+              return next;
             }
           } catch (error) {
             // Ignore backend fetch issues and fall back to local storage below.
@@ -738,27 +750,28 @@
 
         async function getReviews() {
           try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const localList = raw ? dedupeReviews(JSON.parse(raw)) : [];
+
             const backendReviews = await fetchReviewsFromBackend();
-            if (Array.isArray(backendReviews)) {
+            if (Array.isArray(backendReviews) && backendReviews.length) {
               return backendReviews;
             }
 
             if (storage.getReviews && typeof storage.getReviews === 'function') {
               const reviews = dedupeReviews(storage.getReviews());
-              if (Array.isArray(reviews)) return reviews;
+              if (Array.isArray(reviews) && reviews.length) return reviews;
             }
 
-            const raw = localStorage.getItem(STORAGE_KEY);
-            const list = raw ? dedupeReviews(JSON.parse(raw)) : [];
-            if (!Array.isArray(list)) {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-              return [];
+            if (Array.isArray(localList)) {
+              if (localList.length !== (raw ? JSON.parse(raw).length : 0)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(localList));
+              }
+              return localList;
             }
 
-            if (list.length !== (raw ? JSON.parse(raw).length : 0)) {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-            }
-            return list;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+            return [];
           } catch (error) {
             return [];
           }

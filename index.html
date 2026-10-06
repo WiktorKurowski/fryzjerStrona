@@ -1712,6 +1712,7 @@
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (!raw) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
               return [];
             }
 
@@ -1722,13 +1723,7 @@
               return !(email === 'anna@example.com' || email === 'karolina@example.com' || email === 'ewa@example.com') || !message.includes('Kurowska Pracownia Fryzjerska');
             }) : [];
 
-            const dedupedReviews = savedReviews.filter((review, index, arr) => {
-              const key = review && review.id ? `id:${review.id}` : `email:${String(review?.email || '').toLowerCase()}|msg:${String(review?.message || '').trim()}`;
-              return arr.findIndex((item) => {
-                const itemKey = item && item.id ? `id:${item.id}` : `email:${String(item?.email || '').toLowerCase()}|msg:${String(item?.message || '').trim()}`;
-                return itemKey === key;
-              }) === index;
-            });
+            const dedupedReviews = dedupeReviews(savedReviews);
 
             if (dedupedReviews.length !== savedReviews.length || dedupedReviews.length !== (Array.isArray(parsed) ? parsed.length : 0)) {
               localStorage.setItem(STORAGE_KEY, JSON.stringify(dedupedReviews));
@@ -1736,6 +1731,7 @@
 
             return dedupedReviews;
           } catch (error) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             return [];
           }
         }
