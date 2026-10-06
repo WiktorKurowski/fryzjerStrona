@@ -265,131 +265,69 @@
       </div>
     </footer>
 
+    <script src="data.js"></script>
     <script>
       (function () {
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
-        const defaultServices = [
-          {
-            slug: 'strzyzenie-meskie',
-            name: 'Strzyżenie męskie',
-            description: 'Krótkie i klasyczne cięcia',
-            startingPrice: 50,
-            steps: ['Konsultacja', 'Cięcie', 'Stylizacja'],
-            prices: [
-              { label: 'Krótkie', value: 50 },
-              { label: 'Średnie', value: 70 },
-              { label: 'Długie', value: 90 }
-            ]
-          },
-          {
-            slug: 'strzyzenie-damskie',
-            name: 'Strzyżenie damskie',
-            description: 'Fryzura na miarę, z cięciem i modelowaniem',
-            startingPrice: 80,
-            steps: ['Konsultacja', 'Cięcie', 'Modelowanie'],
-            prices: [
-              { label: 'Do ramion', value: 80 },
-              { label: 'Do łopatek', value: 120 },
-              { label: 'Długie', value: 170 }
-            ]
-          },
-          {
-            slug: 'mycie-wlosow',
-            name: 'Mycie włosów',
-            description: 'Delikatne oczyszczanie i masaż skóry głowy',
-            startingPrice: 30,
-            steps: ['Ocena włosów', 'Mycie', 'Dopasowanie pielęgnacji'],
-            prices: [
-              { label: 'Krótko', value: 30 },
-              { label: 'Średnio', value: 40 },
-              { label: 'Długo', value: 55 }
-            ]
-          },
-          {
-            slug: 'modelowanie-wlosow',
-            name: 'Modelowanie włosów',
-            description: 'Stylizacja na co dzień i na specjalne okazje',
-            startingPrice: 70,
-            steps: ['Konsultacja', 'Stylizacja', 'Fiksacja'],
-            prices: [
-              { label: 'Krótko', value: 70 },
-              { label: 'Średnio', value: 95 },
-              { label: 'Długo', value: 130 }
-            ]
-          },
-          {
-            slug: 'koloryzacja',
-            name: 'Koloryzacja',
-            description: 'Pełna lub częściowa, tonowanie i korekta koloru',
-            startingPrice: 180,
-            steps: ['Dobór koloru', 'Aplikacja', 'Finalna korekta'],
-            prices: [
-              { label: 'Korzenie', value: 180 },
-              { label: 'Połowa głowy', value: 230 },
-              { label: 'Pełna', value: 320 }
-            ]
-          },
-          {
-            slug: 'balayage-ombre',
-            name: 'Balayage / ombre',
-            description: 'Naturalne przejścia kolorystyczne',
-            startingPrice: 260,
-            steps: ['Konsultacja', 'Rozjaśnienie', 'Wykończenie'],
-            prices: [
-              { label: 'Krótko', value: 260 },
-              { label: 'Średnio', value: 330 },
-              { label: 'Długo', value: 420 }
-            ]
-          },
-          {
-            slug: 'regeneracja-wlosow',
-            name: 'Regeneracja włosów',
-            description: 'Maska, odbudowa i nawilżenie',
-            startingPrice: 120,
-            steps: ['Diagnoza', 'Maska i odbudowa', 'Nawilżenie'],
-            prices: [
-              { label: 'Krótko', value: 120 },
-              { label: 'Średnio', value: 150 },
-              { label: 'Długo', value: 190 }
-            ]
-          },
-          {
-            slug: 'keratynizacja-prostowanie',
-            name: 'Keratynizacja / prostowanie',
-            description: 'Gładkie i lśniące włosy na dłużej',
-            startingPrice: 250,
-            steps: ['Oczyszczenie', 'Keratynizacja', 'Efekt końcowy'],
-            prices: [
-              { label: 'Krótko', value: 250 },
-              { label: 'Średnio', value: 320 },
-              { label: 'Długo', value: 390 }
-            ]
-          }
-        ];
+        const defaultServices = Array.isArray(window.KUROWSKA_DATA?.services) && window.KUROWSKA_DATA.services.length
+          ? window.KUROWSKA_DATA.services
+          : [];
 
         function getServices() {
           try {
             const raw = localStorage.getItem(SERVICES_KEY);
             if (!raw) {
-              localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              if (defaultServices.length) {
+                localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              }
               return [...defaultServices];
             }
+
             const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) && parsed.length ? parsed : [...defaultServices];
+            if (!Array.isArray(parsed) || !parsed.length) {
+              if (defaultServices.length) {
+                localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              }
+              return [...defaultServices];
+            }
+
+            const merged = defaultServices.map((defaultService) => {
+              const savedService = parsed.find((item) => item && item.slug === defaultService.slug) || {};
+              return {
+                ...defaultService,
+                ...savedService,
+                description: savedService.description || defaultService.description || savedService.detail || defaultService.detail || '',
+                detail: savedService.detail || defaultService.detail || savedService.description || defaultService.description || '',
+                steps: Array.isArray(savedService.steps) && savedService.steps.length ? savedService.steps : defaultService.steps,
+                prices: Array.isArray(savedService.prices) && savedService.prices.length ? savedService.prices : defaultService.prices,
+                startingPrice: Number(savedService.startingPrice) || Number(defaultService.startingPrice) || 0
+              };
+            });
+
+            const extras = parsed
+              .filter((item) => item && item.slug && !defaultServices.some((defaultService) => defaultService.slug === item.slug))
+              .map((item) => ({ ...item }));
+
+            return [...merged, ...extras];
           } catch (error) {
             return [...defaultServices];
           }
         }
 
         function renderService() {
-          const params = new URLSearchParams(window.location.search);
-          const slug = params.get('slug');
-          const services = getServices();
-          const service = services.find((item) => item.slug === slug) || services[0];
           const title = document.getElementById('serviceTitle');
           const intro = document.getElementById('serviceIntro');
           const priceList = document.getElementById('priceList');
           const stepsList = document.getElementById('stepsList');
+
+          if (!title || !intro || !priceList || !stepsList) {
+            return;
+          }
+
+          const params = new URLSearchParams(window.location.search);
+          const slug = params.get('slug');
+          const services = getServices();
+          const service = services.find((item) => item.slug === slug) || services[0] || defaultServices[0];
 
           if (!service) {
             title.textContent = 'Brak usługi';
@@ -398,15 +336,12 @@
           }
 
           title.textContent = service.name;
-          intro.textContent = service.description || 'Szczegółowa oferta dla wybranej usługi.';
+          const detail = service.detail || service.description || 'To usługa dopasowana do Twoich potrzeb, która poprawia wygląd, komfort i trwałość efektu.';
+          intro.textContent = detail;
           document.title = `${service.name} | Kurowska Pracownia Fryzjerska`;
 
           const prices = Array.isArray(service.prices) && service.prices.length ? service.prices : [{ label: 'Cena', value: Number(service.startingPrice) || 0 }];
           const steps = Array.isArray(service.steps) && service.steps.length ? service.steps : ['Konsultacja', 'Dobór stylu', 'Efekt'];
-          const detail = service.detail || 'To usługa dopasowana do Twoich potrzeb, która poprawia wygląd, komfort i trwałość efektu.';
-
-          intro.textContent = detail;
-          document.title = `${service.name} | Kurowska Pracownia Fryzjerska`;
 
           priceList.innerHTML = prices.map((item) => `
             <div class="price-row">

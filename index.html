@@ -225,6 +225,7 @@
         display: block;
         font-size: 1.9rem;
         margin-bottom: 4px;
+        will-change: opacity, transform;
       }
 
       .section {
@@ -653,6 +654,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        min-height: 620px;
+        box-shadow: 0 8px 18px rgba(66, 48, 29, 0.06);
       }
 
       .review-cta p {
@@ -730,21 +733,54 @@
 
       .review-panel {
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1.25fr 0.75fr;
         gap: 24px;
         margin-top: 28px;
+        align-items: stretch;
       }
 
       .reviews-list {
         display: grid;
+        grid-template-columns: 1fr;
         gap: 18px;
+        max-height: 620px;
+        min-height: 620px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 8px 4px 16px;
+        scroll-snap-type: y proximity;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(201, 161, 90, 0.8) rgba(255, 255, 255, 0.08);
+      }
+
+      .reviews-list::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .reviews-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 999px;
+      }
+
+      .reviews-list::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--secondary), var(--secondary-strong));
+        border-radius: 999px;
       }
 
       .review-item {
+        width: 100%;
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 20px;
         padding: 20px 18px;
+        scroll-snap-align: start;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+
+      .review-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(201, 161, 90, 0.8);
+        box-shadow: 0 10px 18px rgba(54, 43, 33, 0.08);
       }
 
       .review-item .stars {
@@ -976,11 +1012,11 @@
               <span>lat doświadczenia</span>
             </div>
             <div class="stat">
-              <strong>5.0</strong>
+              <strong id="heroRatingValue">5.0</strong>
               <span>oceny klientów</span>
             </div>
             <div class="stat">
-              <strong>2k+</strong>
+              <strong id="heroVisitsValue">500</strong>
               <span>zadowolonych wizyt</span>
             </div>
           </div>
@@ -1245,6 +1281,7 @@
       </div>
     </footer>
 
+    <script src="data.js"></script>
     <script>
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
@@ -1290,145 +1327,50 @@
           });
         }
 
-        const defaultServices = [
-          {
-            slug: 'strzyzenie-meskie',
-            name: 'Strzyżenie męskie',
-            description: 'Krótkie i klasyczne cięcia',
-            detail: 'To usługa, która dopasowuje fryzurę do kształtu twarzy, rodzaju włosów i stylu życia. Polega na precyzyjnym cięciu oraz modelowaniu, dzięki czemu efekt wygląda schludnie i naturalnie przez dłuższy czas.',
-            startingPrice: 50,
-            steps: ['Konsultacja', 'Cięcie', 'Stylizacja'],
-            prices: [
-              { label: 'Krótkie', value: 50 },
-              { label: 'Średnie', value: 70 },
-              { label: 'Długie', value: 90 }
-            ]
-          },
-          {
-            slug: 'strzyzenie-damskie',
-            name: 'Strzyżenie damskie',
-            description: 'Fryzura na miarę, z cięciem i modelowaniem',
-            detail: 'Strzyżenie damskie polega na indywidualnym dopasowaniu długości, grzywki i objętości do twarzy oraz preferencji klientki. Efekt końcowy tworzy się dzięki cięciu, a następnie modelowaniu, by fryzura wyglądała lekko i estetycznie.',
-            startingPrice: 80,
-            steps: ['Konsultacja', 'Cięcie', 'Modelowanie'],
-            prices: [
-              { label: 'Do ramion', value: 80 },
-              { label: 'Do łopatek', value: 120 },
-              { label: 'Długie', value: 170 }
-            ]
-          },
-          {
-            slug: 'mycie-wlosow',
-            name: 'Mycie włosów',
-            description: 'Delikatne oczyszczanie i masaż skóry głowy',
-            detail: 'Mycie włosów to nie tylko oczyszczenie, ale też masaż skóry głowy i przygotowanie fryzury do stylizacji. Dobrze dobrany szampon oraz odżywka pomagają odbudować włosy i sprawiają, że są miękkie, lśniące i łatwiejsze do ułożenia.',
-            startingPrice: 30,
-            steps: ['Ocena włosów', 'Mycie', 'Dopasowanie pielęgnacji'],
-            prices: [
-              { label: 'Krótko', value: 30 },
-              { label: 'Średnio', value: 40 },
-              { label: 'Długo', value: 55 }
-            ]
-          },
-          {
-            slug: 'modelowanie-wlosow',
-            name: 'Modelowanie włosów',
-            description: 'Stylizacja na co dzień i na specjalne okazje',
-            detail: 'Modelowanie to zabieg polegający na ułożeniu włosów przy użyciu profesjonalnych narzędzi i produktów, dzięki czemu fryzura utrzymuje kształt, objętość i połysk. Jest świetnym wyborem zarówno na codzienny look, jak i na ważne wyjście.',
-            startingPrice: 70,
-            steps: ['Konsultacja', 'Stylizacja', 'Fiksacja'],
-            prices: [
-              { label: 'Krótko', value: 70 },
-              { label: 'Średnio', value: 95 },
-              { label: 'Długo', value: 130 }
-            ]
-          },
-          {
-            slug: 'koloryzacja',
-            name: 'Koloryzacja',
-            description: 'Pełna lub częściowa, tonowanie i korekta koloru',
-            detail: 'Koloryzacja zmienia odcień włosów, poprawia efekt wizualny i daje możliwość uzyskania bardziej żywego lub naturalnego rezultatu. Zabieg polega na dobieraniu odpowiedniego tonu i aplikacji farby lub tonera, aby kolor był równomierny i trwały.',
-            startingPrice: 180,
-            steps: ['Dobór koloru', 'Aplikacja', 'Finalna korekta'],
-            prices: [
-              { label: 'Korzenie', value: 180 },
-              { label: 'Połowa głowy', value: 230 },
-              { label: 'Pełna', value: 320 }
-            ]
-          },
-          {
-            slug: 'balayage-ombre',
-            name: 'Balayage / ombre',
-            description: 'Naturalne przejścia kolorystyczne',
-            detail: 'Balayage i ombre tworzą delikatne, naturalne przejścia kolorystyczne, które dodają włosom objętości i głębi. Technika polega na ręcznym rozjaśnianiu lub farbowaniu wybranych partii włosów, dzięki czemu efekt wygląda lekko i premium.',
-            startingPrice: 260,
-            steps: ['Konsultacja', 'Rozjaśnienie', 'Wykończenie'],
-            prices: [
-              { label: 'Krótko', value: 260 },
-              { label: 'Średnio', value: 330 },
-              { label: 'Długo', value: 420 }
-            ]
-          },
-          {
-            slug: 'regeneracja-wlosow',
-            name: 'Regeneracja włosów',
-            description: 'Maska, odbudowa i nawilżenie',
-            detail: 'Regeneracja włosów to zabieg pielęgnacyjny mający na celu odbudowę struktury, nawilżenie i wygładzenie kosmyków. Dzięki maskom i odżywkom włosy stają się bardziej miękkie, mniej podatne na łamanie oraz lepiej odzyskują zdrowy wygląd.',
-            startingPrice: 120,
-            steps: ['Diagnoza', 'Maska i odbudowa', 'Nawilżenie'],
-            prices: [
-              { label: 'Krótko', value: 120 },
-              { label: 'Średnio', value: 150 },
-              { label: 'Długo', value: 190 }
-            ]
-          },
-          {
-            slug: 'keratynizacja-prostowanie',
-            name: 'Keratynizacja / prostowanie',
-            description: 'Gładkie i lśniące włosy na dłużej',
-            detail: 'Keratynizacja polega na wygładzeniu włosów za pomocą preparatów wzmacniających i nawilżających, które zmniejszają puszenie i ułatwiają układanie. To rozwiązanie idealne dla osób, które chcą uzyskać efekt gładkich, lśniących i łatwych w stylizacji włosów.',
-            startingPrice: 250,
-            steps: ['Oczyszczenie', 'Keratynizacja', 'Efekt końcowy'],
-            prices: [
-              { label: 'Krótko', value: 250 },
-              { label: 'Średnio', value: 320 },
-              { label: 'Długo', value: 390 }
-            ]
-          }
-        ];
+        const defaultServices = Array.isArray(window.KUROWSKA_DATA?.services) && window.KUROWSKA_DATA.services.length
+          ? window.KUROWSKA_DATA.services
+          : [];
 
-        const defaultReviews = [
-          {
-            id: 1,
-            name: 'Anna',
-            surname: 'Kowalska',
-            surnameInitial: 'K',
-            email: 'anna@example.com',
-            rating: 5,
-            message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura dopasowana do mojej twarzy, a efekt był naprawdę naturalny i elegancki.',
-            createdAt: '2026-10-01T12:00:00.000Z'
-          },
-          {
-            id: 2,
-            name: 'Karolina',
-            surname: 'Malinowska',
-            surnameInitial: 'M',
-            email: 'karolina@example.com',
-            rating: 5,
-            message: 'Doskonała obsługa, profesjonalne podejście i bardzo przyjemna atmosfera. Polecam każdemu, kto szuka stylowej fryzury.',
-            createdAt: '2026-09-15T10:30:00.000Z'
-          }
-        ];
+        const defaultReviews = Array.isArray(window.KUROWSKA_DATA?.reviews) && window.KUROWSKA_DATA.reviews.length
+          ? window.KUROWSKA_DATA.reviews
+          : [];
 
         function getServices() {
           try {
             const raw = localStorage.getItem(SERVICES_KEY);
             if (!raw) {
-              localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              if (defaultServices.length) {
+                localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              }
               return [...defaultServices];
             }
+
             const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) && parsed.length ? parsed : [...defaultServices];
+            if (!Array.isArray(parsed) || !parsed.length) {
+              if (defaultServices.length) {
+                localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+              }
+              return [...defaultServices];
+            }
+
+            const merged = defaultServices.map((defaultService) => {
+              const savedService = parsed.find((item) => item && item.slug === defaultService.slug) || {};
+              return {
+                ...defaultService,
+                ...savedService,
+                description: savedService.description || defaultService.description || savedService.detail || defaultService.detail || '',
+                detail: savedService.detail || defaultService.detail || savedService.description || defaultService.description || '',
+                steps: Array.isArray(savedService.steps) && savedService.steps.length ? savedService.steps : defaultService.steps,
+                prices: Array.isArray(savedService.prices) && savedService.prices.length ? savedService.prices : defaultService.prices,
+                startingPrice: Number(savedService.startingPrice) || Number(defaultService.startingPrice) || 0
+              };
+            });
+
+            const extras = parsed
+              .filter((item) => item && item.slug && !defaultServices.some((defaultService) => defaultService.slug === item.slug))
+              .map((item) => ({ ...item }));
+
+            return [...merged, ...extras];
           } catch (error) {
             return [...defaultServices];
           }
@@ -1436,15 +1378,34 @@
 
         function getReviews() {
           try {
+            const baseReviews = Array.isArray(defaultReviews) ? [...defaultReviews] : [];
             const raw = localStorage.getItem(STORAGE_KEY);
+
             if (!raw) {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReviews));
-              return defaultReviews;
+              if (baseReviews.length) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(baseReviews));
+              }
+              return [...baseReviews];
             }
+
             const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) && parsed.length ? parsed : defaultReviews;
+            const savedReviews = Array.isArray(parsed) ? parsed : [];
+            const mergedReviews = [...baseReviews, ...savedReviews];
+            const uniqueReviews = mergedReviews.filter((review, index, arr) => {
+              const key = review && review.id ? `id:${review.id}` : `email:${String(review?.email || '').toLowerCase()}|msg:${String(review?.message || '').trim()}`;
+              return arr.findIndex((item) => {
+                const itemKey = item && item.id ? `id:${item.id}` : `email:${String(item?.email || '').toLowerCase()}|msg:${String(item?.message || '').trim()}`;
+                return itemKey === key;
+              }) === index;
+            });
+
+            if (uniqueReviews.length) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(uniqueReviews));
+            }
+
+            return uniqueReviews;
           } catch (error) {
-            return defaultReviews;
+            return Array.isArray(defaultReviews) ? [...defaultReviews] : [];
           }
         }
 
@@ -1496,6 +1457,44 @@
           }).join('');
         }
 
+        function animateNumber(element, target, decimals = 0, delay = 0) {
+          if (!element) return;
+
+          element.style.opacity = '0';
+          element.style.transform = 'translateY(8px)';
+
+          setTimeout(() => {
+            element.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+
+            const duration = 1200;
+            const start = performance.now();
+
+            function update(now) {
+              const progress = Math.min((now - start) / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+              const currentValue = target * eased;
+
+              if (decimals > 0) {
+                element.textContent = Number(currentValue).toFixed(decimals);
+              } else {
+                element.textContent = String(Math.round(currentValue));
+              }
+
+              if (progress < 1) {
+                requestAnimationFrame(update);
+              } else if (decimals > 0) {
+                element.textContent = Number(target).toFixed(decimals);
+              } else {
+                element.textContent = String(Math.round(target));
+              }
+            }
+
+            requestAnimationFrame(update);
+          }, delay);
+        }
+
         function renderReviews() {
           const list = document.getElementById('reviews-list');
           if (!list) return;
@@ -1505,15 +1504,26 @@
           const averageRating = visibleRatingValues.length ? (visibleRatingValues.reduce((sum, value) => sum + value, 0) / visibleRatingValues.length).toFixed(1) : '5.0';
           const positiveReviews = reviews.filter((review) => isPositiveReviewText(review.message)).length;
           const totalVisits = 500 + positiveReviews;
+          const parsedAverage = Number(averageRating) || 5;
 
           const averageElement = document.getElementById('reviewsAverage');
           if (averageElement) {
-            averageElement.textContent = averageRating;
+            animateNumber(averageElement, parsedAverage, 1, 0);
+          }
+
+          const heroAverageElement = document.getElementById('heroRatingValue');
+          if (heroAverageElement) {
+            animateNumber(heroAverageElement, parsedAverage, 1, 150);
           }
 
           const visitsElement = document.getElementById('reviewsVisits');
           if (visitsElement) {
-            visitsElement.textContent = String(totalVisits);
+            animateNumber(visitsElement, Number(totalVisits), 0, 250);
+          }
+
+          const heroVisitsElement = document.getElementById('heroVisitsValue');
+          if (heroVisitsElement) {
+            animateNumber(heroVisitsElement, Number(totalVisits), 0, 400);
           }
 
           list.innerHTML = reviews.map((review) => {
