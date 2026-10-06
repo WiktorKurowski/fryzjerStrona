@@ -693,6 +693,7 @@
       .calendar-fullwidth {
         margin-top: 30px;
         width: 100%;
+        grid-column: 1 / -1;
       }
 
       .contact-card,
@@ -1003,7 +1004,7 @@
       }
 
       .availability-title {
-        margin: 0 0 12px;
+        margin: 0;
         font-size: 0.82rem;
         letter-spacing: 0.1em;
         text-transform: uppercase;
@@ -1011,9 +1012,55 @@
         font-weight: 800;
       }
 
+      .calendar-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+
+      .calendar-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(141, 107, 46, 0.06);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 10px;
+      }
+
+      .calendar-month-label {
+        min-width: 150px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .calendar-nav-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        font-size: 1.15rem;
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .calendar-nav-btn:hover,
+      .calendar-nav-btn:focus-visible {
+        border-color: rgba(141, 107, 46, 0.3);
+        box-shadow: 0 0 0 3px rgba(141, 107, 46, 0.12);
+        transform: translateY(-1px);
+      }
+
       .calendar-grid {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 10px;
         width: 100%;
       }
@@ -1042,6 +1089,17 @@
       .calendar-day.is-booked {
         background: linear-gradient(180deg, rgba(181, 96, 72, 0.09), rgba(181, 96, 72, 0.04));
         border-color: rgba(181, 96, 72, 0.2);
+      }
+
+      .calendar-day.is-past {
+        opacity: 0.68;
+        filter: saturate(0.75);
+        text-decoration: line-through;
+      }
+
+      .calendar-day.is-past .calendar-badge {
+        background: rgba(98, 98, 98, 0.12);
+        color: #666;
       }
 
       .calendar-header {
@@ -1493,13 +1551,20 @@
                   <li><span>Niedziela</span><span>Brak</span></li>
                 </ul>
               </div>
+            </div>
+          </div>
 
-              <div class="availability-card calendar-fullwidth">
-                <div class="availability-wrap">
-                  <p class="availability-title">Kalendarz dostępności</p>
-                  <div id="availabilityCalendar" class="calendar-grid"></div>
+          <div class="availability-card calendar-fullwidth">
+            <div class="availability-wrap">
+              <div class="calendar-header-row">
+                <p class="availability-title">Kalendarz dostępności</p>
+                <div class="calendar-nav" aria-label="Nawigacja po kalendarzu">
+                  <button type="button" class="calendar-nav-btn" data-direction="prev" aria-label="Poprzedni miesiąc">&#8249;</button>
+                  <span id="calendarMonthLabel" class="calendar-month-label">Miesiąc</span>
+                  <button type="button" class="calendar-nav-btn" data-direction="next" aria-label="Następny miesiąc">&#8250;</button>
                 </div>
               </div>
+              <div id="availabilityCalendar" class="calendar-grid"></div>
             </div>
           </div>
         </div>
@@ -1882,31 +1947,58 @@
           };
         }
 
+        const calendarState = {
+          monthStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+        };
+
+        function getCalendarMonthLabel(date) {
+          return date.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+        }
+
         function renderAvailabilityCalendar() {
           const container = document.getElementById('availabilityCalendar');
+          const monthLabel = document.getElementById('calendarMonthLabel');
           if (!container) return;
 
-          const start = new Date();
-          start.setHours(0, 0, 0, 0);
+          if (monthLabel) {
+            monthLabel.textContent = getCalendarMonthLabel(calendarState.monthStart);
+          }
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const firstDayOfMonth = new Date(calendarState.monthStart.getFullYear(), calendarState.monthStart.getMonth(), 1);
+          const firstVisibleDate = new Date(firstDayOfMonth);
+          firstVisibleDate.setDate(firstVisibleDate.getDate() - firstVisibleDate.getDay());
 
           const cells = [];
-          for (let offset = 0; offset < 12; offset += 1) {
-            const date = new Date(start);
-            date.setDate(start.getDate() + offset);
+          for (let offset = 0; offset < 42; offset += 1) {
+            const date = new Date(firstVisibleDate);
+            date.setDate(firstVisibleDate.getDate() + offset);
+
             const availability = getAvailabilityForDate(date);
-            const shortDay = date.toLocaleDateString('pl-PL', { weekday: 'short' }).replace('.', '');
-            const dayNumber = date.getDate();
+            const isPastDate = date <= today;
+            const displayAvailability = isPastDate
+              ? {
+                  state: 'past',
+                  status: 'Niedostępne',
+                  hours: 'Termin minął',
+                  badge: 'Niedostępne'
+                }
+              : availability;
+            const shortDay = date.toLocaleDateString('pl-PL', { weekday: 'short' }).replace('.', '').replace('.', '');
+            const isCurrentMonth = date.getMonth() === calendarState.monthStart.getMonth();
 
             cells.push(`
-              <div class="calendar-day ${availability.state === 'closed' ? 'is-closed' : ''} ${availability.state === 'holiday' ? 'is-holiday' : ''} ${availability.state === 'booked' ? 'is-booked' : ''}">
+              <div class="calendar-day ${displayAvailability.state === 'closed' ? 'is-closed' : ''} ${displayAvailability.state === 'holiday' ? 'is-holiday' : ''} ${displayAvailability.state === 'booked' ? 'is-booked' : ''} ${displayAvailability.state === 'past' ? 'is-past' : ''} ${isCurrentMonth ? '' : 'is-outside-month'}">
                 <div class="calendar-header">
-                  <strong>${dayNumber}</strong>
-                  <span class="calendar-badge">${availability.badge}</span>
+                  <strong>${date.getDate()}</strong>
+                  <span class="calendar-badge">${displayAvailability.badge}</span>
                 </div>
                 <small>${shortDay}</small>
                 <div class="calendar-hours">
-                  <div>${availability.status}</div>
-                  <div>${availability.hours}</div>
+                  <div>${displayAvailability.status}</div>
+                  <div>${displayAvailability.hours}</div>
                 </div>
               </div>
             `);
@@ -1914,6 +2006,20 @@
 
           container.innerHTML = cells.join('');
         }
+
+        document.addEventListener('click', function (event) {
+          const button = event.target.closest('.calendar-nav-btn');
+          if (!button) return;
+
+          const direction = button.dataset.direction === 'prev' ? -1 : 1;
+          calendarState.monthStart = new Date(
+            calendarState.monthStart.getFullYear(),
+            calendarState.monthStart.getMonth() + direction,
+            1
+          );
+
+          renderAvailabilityCalendar();
+        });
 
         function renderOpeningHours() {
           const list = document.querySelector('.hours-list');
