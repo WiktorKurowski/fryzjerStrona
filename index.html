@@ -754,7 +754,7 @@
 
     <header>
       <div class="container nav">
-        <a href="#home" class="logo">Kurowska <span>Pracownia</span></a>
+        <a href="./" class="logo">Kurowska <span>Pracownia</span></a>
         <nav class="nav-links" aria-label="Nawigacja główna">
           <a href="#o-nas">O nas</a>
           <a href="#uslugi">Usługi</a>
@@ -766,7 +766,7 @@
       </div>
     </header>
 
-    <main id="home">
+    <main id="top">
       <section class="hero">
         <div class="container hero-content">
           <span class="eyebrow">Kurowska Pracownia Fryzjerska</span>
@@ -1166,6 +1166,23 @@
             `;
           }).join('');
         }
+
+        document.querySelectorAll('a[href^="#"]').forEach((link) => {
+          link.addEventListener('click', function (event) {
+            const targetId = this.getAttribute('href');
+            if (!targetId || targetId === '#') {
+              event.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+            }
+
+            const target = document.querySelector(targetId);
+            if (target) {
+              event.preventDefault();
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        });
 
         const form = document.getElementById('reviewForm');
         if (form) {
