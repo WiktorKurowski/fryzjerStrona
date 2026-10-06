@@ -184,6 +184,26 @@
         border-bottom: 1px solid var(--line);
       }
 
+      .status-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .status-visible {
+        background: rgba(41, 150, 97, 0.12);
+        color: #1d6a45;
+      }
+
+      .status-blocked {
+        background: rgba(183, 77, 61, 0.12);
+        color: #7d3027;
+      }
+
       .review-table th {
         font-size: 0.8rem;
         text-transform: uppercase;
@@ -191,14 +211,23 @@
         color: var(--muted);
       }
 
-      .review-table .delete-btn {
-        background: #b74d3d;
-        color: #fff;
+      .review-table .delete-btn,
+      .review-table .toggle-btn {
         border: none;
         border-radius: 10px;
         padding: 8px 12px;
         font-weight: 700;
         cursor: pointer;
+      }
+
+      .review-table .delete-btn {
+        background: #b74d3d;
+        color: #fff;
+      }
+
+      .review-table .toggle-btn {
+        background: #d9c3a8;
+        color: var(--primary);
       }
 
       .logout-btn {
@@ -295,6 +324,7 @@
                       <th>Autor</th>
                       <th>Opinia</th>
                       <th>Email</th>
+                      <th>Status</th>
                       <th>Data</th>
                       <th>Akcja</th>
                     </tr>
@@ -500,19 +530,45 @@
             }
 
             tbody.innerHTML = reviews.map((review) => {
-              const author = `${review.name} ${review.surnameInitial || ''}.`;
+              const author = `${review.name} ${review.surname || review.surnameInitial || ''}`.trim();
               const date = review.createdAt ? new Date(review.createdAt).toLocaleDateString('pl-PL') : '—';
+              const isHidden = Boolean(review.hidden || review.status === 'blocked');
+              const status = isHidden ? 'Ukryta' : 'Publiczna';
+              const statusClass = isHidden ? 'status-blocked' : 'status-visible';
+              const toggleLabel = isHidden ? 'Pokaż' : 'Ukryj';
 
               return `
                 <tr>
                   <td>${author}</td>
                   <td>${review.message || ''}</td>
                   <td>${review.email || ''}</td>
+                  <td><span class="status-badge ${statusClass}">${status}</span></td>
                   <td>${date}</td>
-                  <td><button class="delete-btn" data-id="${review.id}">Usuń</button></td>
+                  <td>
+                    <button class="toggle-btn" data-id="${review.id}" data-hidden="${isHidden ? 'true' : 'false'}">${toggleLabel}</button>
+                    <button class="delete-btn" data-id="${review.id}">Usuń</button>
+                  </td>
                 </tr>
               `;
             }).join('');
+
+            document.querySelectorAll('.toggle-btn').forEach((button) => {
+              button.addEventListener('click', function () {
+                const id = Number(this.dataset.id);
+                const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                const updated = current.map((review) => {
+                  if (Number(review.id) !== id) return review;
+                  const hidden = this.dataset.hidden === 'true' ? false : true;
+                  return {
+                    ...review,
+                    hidden,
+                    status: hidden ? 'blocked' : 'visible'
+                  };
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                renderReviews();
+              });
+            });
 
             document.querySelectorAll('.delete-btn').forEach((button) => {
               button.addEventListener('click', function () {

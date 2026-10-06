@@ -6,16 +6,16 @@
     <title>Kurowska Pracownia Fryzjerska</title>
     <style>
       :root {
-        --bg: #fff7f2;
-        --bg-soft: #fbece5;
-        --card: #fffdfb;
-        --primary: #1f1a1a;
-        --secondary: #b4684f;
-        --secondary-strong: #8d4735;
-        --accent: #f4d2bf;
-        --text: #2a2525;
-        --muted: #6f5f5b;
-        --line: #f0dfd8;
+        --bg: #f1eee9;
+        --bg-soft: #e7dfd1;
+        --card: #f8f5f1;
+        --primary: #111111;
+        --secondary: #c39a4d;
+        --secondary-strong: #8d6b2e;
+        --accent: #d6c8a7;
+        --text: #171717;
+        --muted: #5f564e;
+        --line: #d9c9a8;
       }
 
       * {
@@ -30,8 +30,8 @@
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
         background:
-          radial-gradient(circle at top, rgba(244, 210, 191, 0.9), transparent 28%),
-          linear-gradient(180deg, var(--bg) 0%, #fffaf8 100%);
+          radial-gradient(circle at top, rgba(195, 154, 77, 0.22), transparent 26%),
+          linear-gradient(180deg, #efeee9 0%, #e2ddd4 100%);
         color: var(--text);
         line-height: 1.6;
       }
@@ -52,10 +52,10 @@
       }
 
       .topbar {
-        background: linear-gradient(90deg, #1f1b1b 0%, #342d2b 100%);
+        background: linear-gradient(90deg, #0f0f0f 0%, #2a221d 100%);
         color: #fff;
         font-size: 0.9rem;
-        box-shadow: 0 4px 18px rgba(31, 27, 27, 0.18);
+        box-shadow: 0 4px 18px rgba(17, 17, 17, 0.2);
       }
 
       .topbar-inner {
@@ -75,12 +75,12 @@
       }
 
       header {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(8px);
+        background: rgba(20, 20, 20, 0.84);
+        backdrop-filter: blur(10px);
         position: sticky;
         top: 0;
         z-index: 10;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid rgba(214, 200, 167, 0.35);
       }
 
       .nav {
@@ -108,7 +108,7 @@
       }
 
       .nav-links a {
-        color: var(--primary);
+        color: #f5f1ea;
         transition: color 0.2s ease;
       }
 
@@ -126,12 +126,12 @@
         font-weight: 700;
         cursor: pointer;
         transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
-        box-shadow: 0 14px 28px rgba(180, 104, 79, 0.25);
+        box-shadow: 0 14px 28px rgba(201, 161, 90, 0.28);
       }
 
       .btn:hover {
         transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 18px 36px rgba(180, 104, 79, 0.35);
+        box-shadow: 0 18px 36px rgba(201, 161, 90, 0.38);
         opacity: 1;
       }
 
@@ -316,7 +316,7 @@
         display: grid;
         place-items: center;
         border-radius: 16px;
-        background: linear-gradient(135deg, #f8e4d9, #faefe9);
+        background: linear-gradient(135deg, #f4ead6, #f8f2e9);
         font-size: 1.5rem;
         margin-bottom: 16px;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -334,7 +334,8 @@
       }
 
       .services {
-        background: linear-gradient(180deg, #f9efe9 0%, #f5e7df 100%);
+        background: linear-gradient(180deg, #1d1b1a 0%, #2a241f 100%);
+        color: #f3efe8;
       }
 
       .price-grid {
@@ -344,8 +345,8 @@
       }
 
       .price-item {
-        background: linear-gradient(180deg, #fff 0%, #fffaf8 100%);
-        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        border: 1px solid rgba(214, 200, 167, 0.25);
         border-radius: 18px;
         padding: 22px 20px;
         display: flex;
@@ -353,6 +354,7 @@
         align-items: center;
         gap: 12px;
         transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+        color: #f3efe8;
       }
 
       .price-item:hover {
@@ -373,7 +375,7 @@
       .service-desc {
         display: block;
         font-size: 0.9rem;
-        color: var(--muted);
+        color: rgba(243, 239, 232, 0.76);
         margin-top: 4px;
       }
 
@@ -391,13 +393,16 @@
 
       .gallery-card {
         display: grid;
-        gap: 10px;
+        gap: 12px;
+        align-items: stretch;
+        height: 100%;
       }
 
       .gallery-item {
         border-radius: 22px;
         overflow: hidden;
         min-height: 260px;
+        height: 360px;
         background: linear-gradient(135deg, #dcc8be, #efe3dc);
         position: relative;
         box-shadow: 0 18px 35px rgba(40, 29, 23, 0.08);
@@ -433,21 +438,26 @@
       }
 
       .gallery-link {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
-        padding: 10px 14px;
+        width: 100%;
+        min-height: 52px;
+        height: 52px;
+        padding: 12px 18px;
         border-radius: 999px;
         background: rgba(180, 104, 79, 0.08);
         border: 1px solid rgba(180, 104, 79, 0.18);
         color: var(--secondary-strong);
         font-weight: 700;
-        transition: transform 0.22s ease, background 0.22s ease;
+        text-align: center;
+        transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
       }
 
       .gallery-link:hover {
         background: rgba(180, 104, 79, 0.14);
         transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(180, 104, 79, 0.12);
       }
 
       .contact-wrap {
@@ -530,6 +540,46 @@
       .review-form textarea {
         min-height: 120px;
         resize: vertical;
+      }
+
+      .rating-field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .rating-field label {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .rating-stars {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .rating-star {
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        color: #d9d9d9;
+        font-size: 1.7rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+
+      .rating-star:hover,
+      .rating-star:focus-visible,
+      .rating-star.active,
+      .rating-star.hovered {
+        color: #f6b500;
+        border-color: #f6b500;
+        box-shadow: 0 0 0 3px rgba(246, 181, 0, 0.12);
+        transform: translateY(-1px);
       }
 
       .review-form-row {
@@ -904,6 +954,17 @@
             <p>Kurowska Pracownia Fryzjerska zyskuje uznanie dzięki profesjonalnej opiece i efektom, które zostają na długo.</p>
           </div>
 
+          <div class="reviews-summary" style="display:grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 16px; margin: 0 0 22px;">
+            <div class="summary-card" style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px;">
+              <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px;">Średnia ocen</div>
+              <div id="reviewsAverage" style="font-size: clamp(1.8rem, 2vw, 2.6rem); font-weight: 800; color: var(--text); line-height: 1.1;">5.0</div>
+            </div>
+            <div class="summary-card" style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px;">
+              <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px;">Zadowoleni klienci</div>
+              <div id="reviewsVisits" style="font-size: clamp(1.8rem, 2vw, 2.6rem); font-weight: 800; color: var(--text); line-height: 1.1;">500</div>
+            </div>
+          </div>
+
           <div class="review-panel">
             <div class="reviews-list" id="reviews-list"></div>
 
@@ -912,10 +973,23 @@
               <form class="review-form" id="reviewForm">
                 <div class="review-form-row">
                   <input type="text" id="reviewName" placeholder="Imię" aria-label="Imię" required />
-                  <input type="text" id="reviewSurnameInitial" placeholder="Pierwsza litera nazwiska" aria-label="Pierwsza litera nazwiska" maxlength="1" required />
+                  <input type="text" id="reviewSurname" placeholder="Nazwisko" aria-label="Nazwisko" required />
                 </div>
                 <input type="email" id="reviewEmail" placeholder="Adres e-mail" aria-label="Adres e-mail" required />
                 <textarea id="reviewText" placeholder="Napisz opinię..." aria-label="Napisz opinię" required></textarea>
+
+                <div class="rating-field">
+                  <label for="reviewRating">Ocena</label>
+                  <div class="rating-stars" id="reviewRatingStars" aria-label="Wybierz ocenę od 1 do 5">
+                    <button type="button" class="rating-star active" data-value="1" aria-label="1 z 5" title="1/5">★</button>
+                    <button type="button" class="rating-star active" data-value="2" aria-label="2 z 5" title="2/5">★</button>
+                    <button type="button" class="rating-star active" data-value="3" aria-label="3 z 5" title="3/5">★</button>
+                    <button type="button" class="rating-star active" data-value="4" aria-label="4 z 5" title="4/5">★</button>
+                    <button type="button" class="rating-star active" data-value="5" aria-label="5 z 5" title="5/5">★</button>
+                  </div>
+                  <input type="hidden" id="reviewRating" name="reviewRating" value="5" />
+                </div>
+
                 <button type="submit" class="btn">Dodaj opinię</button>
               </form>
               <div class="review-success" id="reviewSuccess">Dziękujemy! Twoja opinia została zapisana.</div>
@@ -980,6 +1054,47 @@
       (function () {
         const STORAGE_KEY = 'kurowska_pracownia_opinie';
         const SERVICES_KEY = 'kurowska_pracownia_uslugi';
+        const bannedTerms = [
+          'chuj', 'chuja', 'chujek', 'chujem', 'chujnia', 'kurwa', 'kurew', 'kurewski', 'dupa', 'dupka',
+          'pizda', 'pizdy', 'pierdol', 'pierdolec', 'jebac', 'jebie', 'jeba', 'cipa', 'cipka',
+          'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'crap', 'dick', 'slut', 'whore', 'idiot',
+          'sh1t', 'fck', 'b1tch', 'd1ck', 'ch00j', 'p1zda', 'huj', 'hujek', 'svin', 'suka'
+        ];
+
+        function normalizeText(value) {
+          return String(value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+        }
+
+        function containsBannedText(value) {
+          const normalized = normalizeText(value);
+          return bannedTerms.some((term) => {
+            const clean = normalizeText(term);
+            return normalized.includes(clean) || normalized.includes(clean.replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/5/g, 's').replace(/7/g, 't'));
+          });
+        }
+
+        function isBlockedReview(review) {
+          return containsBannedText(review.name) || containsBannedText(review.surname) || containsBannedText(review.message);
+        }
+
+        function canSubmitReview(email) {
+          const reviews = getReviews();
+          const normalizedEmail = String(email || '').trim().toLowerCase();
+          if (!normalizedEmail) return false;
+
+          const now = Date.now();
+          return !reviews.some((review) => {
+            if (!review.email || String(review.email).trim().toLowerCase() !== normalizedEmail) return false;
+            const createdAt = new Date(review.createdAt || review.date || 0).getTime();
+            if (!createdAt) return false;
+            return now - createdAt < 30 * 24 * 60 * 60 * 1000;
+          });
+        }
+
         const defaultServices = [
           {
             slug: 'strzyzenie-meskie',
@@ -1075,16 +1190,20 @@
           {
             id: 1,
             name: 'Anna',
+            surname: 'Kowalska',
             surnameInitial: 'K',
             email: 'anna@example.com',
+            rating: 5,
             message: 'Świetna jakość usług w Kurowska Pracownia Fryzjerska. Fryzura dopasowana do mojej twarzy, a efekt był naprawdę naturalny i elegancki.',
             createdAt: '2026-10-01T12:00:00.000Z'
           },
           {
             id: 2,
             name: 'Karolina',
+            surname: 'Malinowska',
             surnameInitial: 'M',
             email: 'karolina@example.com',
+            rating: 5,
             message: 'Doskonała obsługa, profesjonalne podejście i bardzo przyjemna atmosfera. Polecam każdemu, kto szuka stylowej fryzury.',
             createdAt: '2026-09-15T10:30:00.000Z'
           }
@@ -1118,6 +1237,27 @@
           }
         }
 
+        function isPositiveReviewText(value) {
+          const text = normalizeText(value || '');
+          if (!text) return false;
+
+          const positiveWords = [
+            'polecam', 'super', 'swietnie', 'świetnie', 'dobrze', 'dobra', 'dobry', 'doskonale',
+            'profesjonalnie', 'przyjemna', 'przyjazna', 'sekret', 'fajnie', 'efekt', 'zadowolona',
+            'zadowolony', 'idealnie', 'naturalnie', 'perfekcyjnie', 'fantastycznie', 'mile', 'szybko',
+            'pięknie', 'pieknie', 'polecamy', 'bardzo', 'milosc', 'naprawde', 'naprawdę', 'elegancki'
+          ];
+
+          const negativeWords = [
+            'niepolecam', 'nie polecam', 'zle', 'źle', 'kiepsko', 'slabo', 'fatalnie', 'niedobrze',
+            'nienawidze', 'brzydko', 'ohydnie', 'rozczarowuje', 'zawiodlem', 'zawiodłam'
+          ];
+
+          const hasPositive = positiveWords.some((word) => text.includes(normalizeText(word)));
+          const hasNegative = negativeWords.some((word) => text.includes(normalizeText(word)));
+          return hasPositive && !hasNegative;
+        }
+
         function renderServices() {
           const grid = document.getElementById('priceGrid');
           if (!grid) return;
@@ -1145,9 +1285,28 @@
           const list = document.getElementById('reviews-list');
           if (!list) return;
 
-          const reviews = getReviews();
+          const reviews = getReviews().filter((review) => !(review.hidden || review.status === 'blocked'));
+          const visibleRatingValues = reviews.map((review) => Math.max(1, Math.min(5, Number(review.rating) || 5)));
+          const averageRating = visibleRatingValues.length ? (visibleRatingValues.reduce((sum, value) => sum + value, 0) / visibleRatingValues.length).toFixed(1) : '5.0';
+          const positiveReviews = reviews.filter((review) => isPositiveReviewText(review.message)).length;
+          const totalVisits = 500 + positiveReviews;
+
+          const averageElement = document.getElementById('reviewsAverage');
+          if (averageElement) {
+            averageElement.textContent = averageRating;
+          }
+
+          const visitsElement = document.getElementById('reviewsVisits');
+          if (visitsElement) {
+            visitsElement.textContent = String(totalVisits);
+          }
+
           list.innerHTML = reviews.map((review) => {
-            const author = `${review.name} ${review.surnameInitial}.`;
+            const surnameDisplay = (review.surname || review.surnameInitial || '').trim();
+            const initial = surnameDisplay ? `${surnameDisplay.charAt(0).toUpperCase()}.` : '';
+            const author = `${review.name} ${initial}`.trim();
+            const rating = Math.max(1, Math.min(5, Number(review.rating) || 5));
+            const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
             const date = review.createdAt ? new Date(review.createdAt).toLocaleDateString('pl-PL', {
               day: '2-digit',
               month: '2-digit',
@@ -1156,7 +1315,7 @@
 
             return `
               <article class="review-item">
-                <div class="stars">★★★★★</div>
+                <div class="stars">${stars}</div>
                 <p>“${review.message}”</p>
                 <div class="review-meta">
                   <span class="review-author">${author}</span>
@@ -1184,31 +1343,93 @@
           });
         });
 
+        const ratingButtons = document.querySelectorAll('.rating-star');
+        const reviewRatingInput = document.getElementById('reviewRating');
+
+        function setRatingPreview(value) {
+          ratingButtons.forEach((button) => {
+            const buttonValue = Number(button.dataset.value || 0);
+            button.classList.toggle('active', buttonValue <= value);
+            button.classList.toggle('hovered', buttonValue <= value);
+          });
+        }
+
+        if (ratingButtons.length && reviewRatingInput) {
+          const selectedValue = Math.max(1, Math.min(5, Number(reviewRatingInput.value) || 5));
+          reviewRatingInput.value = String(selectedValue);
+          setRatingPreview(selectedValue);
+
+          ratingButtons.forEach((button) => {
+            button.addEventListener('mouseenter', function () {
+              const hoveredValue = Number(this.dataset.value || 1);
+              setRatingPreview(hoveredValue);
+            });
+
+            button.addEventListener('mouseleave', function () {
+              const currentValue = Math.max(1, Math.min(5, Number(reviewRatingInput.value) || 5));
+              setRatingPreview(currentValue);
+            });
+
+            button.addEventListener('click', function () {
+              const selected = Number(this.dataset.value || 1);
+              reviewRatingInput.value = String(Math.max(1, Math.min(5, selected)));
+              setRatingPreview(selected);
+            });
+          });
+        }
+
         const form = document.getElementById('reviewForm');
         if (form) {
           form.addEventListener('submit', function (event) {
             event.preventDefault();
 
             const name = document.getElementById('reviewName').value.trim();
-            const surnameInitial = document.getElementById('reviewSurnameInitial').value.trim().slice(0, 1).toUpperCase();
+            const surname = document.getElementById('reviewSurname').value.trim();
             const email = document.getElementById('reviewEmail').value.trim();
             const message = document.getElementById('reviewText').value.trim();
+            const rating = Math.max(1, Math.min(5, Number(document.getElementById('reviewRating').value) || 1));
 
-            if (!name || !surnameInitial || !email || !message) {
+            if (!name || !surname || !email || !message) {
               alert('Wypełnij wszystkie pola formularza.');
+              return;
+            }
+
+            if (!canSubmitReview(email)) {
+              alert('Ten adres e-mail może dodać tylko jedną opinię w ciągu 30 dni.');
               return;
             }
 
             const newReview = {
               id: Date.now(),
               name,
-              surnameInitial,
+              surname,
+              surnameInitial: surname.charAt(0).toUpperCase(),
               email,
+              rating,
               message,
+              hidden: false,
+              status: 'visible',
               createdAt: new Date().toISOString()
             };
 
             const reviews = getReviews();
+            const blocked = isBlockedReview(newReview);
+
+            if (blocked) {
+              newReview.hidden = true;
+              newReview.status = 'blocked';
+              reviews.unshift(newReview);
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+              } catch (error) {
+                console.error(error);
+              }
+              alert('Twoja opinia została zablokowana przez automoderację i widoczna jest tylko w panelu admina.');
+              form.reset();
+              renderReviews();
+              return;
+            }
+
             reviews.unshift(newReview);
 
             try {
