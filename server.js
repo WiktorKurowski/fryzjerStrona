@@ -76,6 +76,32 @@ function ensureStore() {
       appointments: [],
       reviews: DEFAULT_REVIEWS
     }, null, 2));
+    return;
+  }
+
+  const raw = fs.readFileSync(DATA_FILE, 'utf8');
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.reviews)) {
+      fs.writeFileSync(DATA_FILE, JSON.stringify({
+        services: Array.isArray(parsed?.services) ? parsed.services : [],
+        hours: Array.isArray(parsed?.hours) ? parsed.hours : [],
+        holiday: parsed?.holiday || { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
+        appointments: Array.isArray(parsed?.appointments) ? parsed.appointments : [],
+        reviews: DEFAULT_REVIEWS
+      }, null, 2));
+    } else if (parsed.reviews.length === 0) {
+      parsed.reviews = DEFAULT_REVIEWS;
+      fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
+    }
+  } catch (error) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify({
+      services: [],
+      hours: [],
+      holiday: { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' },
+      appointments: [],
+      reviews: DEFAULT_REVIEWS
+    }, null, 2));
   }
 }
 
@@ -83,7 +109,16 @@ function readStore() {
   ensureStore();
   const raw = fs.readFileSync(DATA_FILE, 'utf8');
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.reviews)) {
+      parsed.reviews = DEFAULT_REVIEWS;
+      fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
+    }
+    if (parsed.reviews.length === 0) {
+      parsed.reviews = DEFAULT_REVIEWS;
+      fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
+    }
+    return parsed;
   } catch (error) {
     return {
       services: [],

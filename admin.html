@@ -724,6 +724,30 @@
           return null;
         }
 
+        async function saveReviewsToBackend(nextReviews) {
+          try {
+            const response = await fetch('/api/reviews', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+              },
+              body: JSON.stringify(nextReviews)
+            });
+
+            if (!response.ok) {
+              throw new Error('Failed to save reviews');
+            }
+
+            const result = await response.json().catch(() => nextReviews);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.isArray(result) ? result : nextReviews));
+            return Array.isArray(result) ? result : nextReviews;
+          } catch (error) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nextReviews));
+            return nextReviews;
+          }
+        }
+
         async function getReviews() {
           try {
             const backendReviews = await fetchReviewsFromBackend();
@@ -1251,13 +1275,14 @@
               `;
             }).join('');
 
-            document.querySelectorAll('.toggle-btn').forEach((button) => {
-              button.addEventListener('click', async function () {
-                const id = Number(this.dataset.id);
+            tbody.onclick = async function (event) {
+              const toggleButton = event.target.closest('.toggle-btn');
+              if (toggleButton) {
+                const id = Number(toggleButton.dataset.id);
                 const current = await getReviews();
                 const updated = current.map((review) => {
                   if (Number(review.id) !== id) return review;
-                  const hidden = this.dataset.hidden === 'true' ? false : true;
+                  const hidden = toggleButton.dataset.hidden === 'true' ? false : true;
                   return {
                     ...review,
                     hidden,
@@ -1266,26 +1291,24 @@
                 });
                 if (storage.saveReviews && typeof storage.saveReviews === 'function') {
                   storage.saveReviews(updated);
-                } else {
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                 }
+                await saveReviewsToBackend(updated);
                 await renderReviews();
-              });
-            });
+                return;
+              }
 
-            document.querySelectorAll('.delete-btn').forEach((button) => {
-              button.addEventListener('click', async function () {
-                const id = Number(this.dataset.id);
+              const deleteButton = event.target.closest('.delete-btn');
+              if (deleteButton) {
+                const id = Number(deleteButton.dataset.id);
                 const current = await getReviews();
                 const filtered = current.filter((review) => Number(review.id) !== id);
                 if (storage.saveReviews && typeof storage.saveReviews === 'function') {
                   storage.saveReviews(filtered);
-                } else {
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
                 }
+                await saveReviewsToBackend(filtered);
                 await renderReviews();
-              });
-            });
+              }
+            };
           } catch (error) {
             tbody.innerHTML = '<tr><td colspan="5">Błąd odczytu opinii.</td></tr>';
           }
