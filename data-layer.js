@@ -26,14 +26,26 @@
     return value;
   }
 
+  function getAdminToken() {
+    try {
+      return sessionStorage.getItem('kurowska_admin_token') || '';
+    } catch (error) {
+      return '';
+    }
+  }
+
   async function requestJson(path, method = 'GET', payload) {
-    const options = {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
     };
+
+    const token = getAdminToken();
+    if (token && !path.startsWith('/api/admin/login')) {
+      headers['x-admin-token'] = token;
+    }
+
+    const options = { method, headers };
 
     if (payload !== undefined) {
       options.body = JSON.stringify(payload);

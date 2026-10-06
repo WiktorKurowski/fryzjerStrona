@@ -503,8 +503,9 @@
         const HOURS_KEY = 'kurowska_pracownia_godziny';
         const HOLIDAY_KEY = 'kurowska_pracownia_wakacje';
         const APPOINTMENTS_KEY = 'kurowska_pracownia_wizyty';
-        const ADMIN_LOGIN = 'admin';
-        const ADMIN_PASSWORD = 'kurowska2025';
+        const ADMIN_LOGIN = 'kurowska_admin';
+        const ADMIN_PASSWORD = 'Kurowska!Fryzjer2026#Admin';
+        // W produkcji lepiej trzymać hasło po stronie backendu i w zmiennych środowiskowych.
         const storage = window.KUROWSKA_STORAGE || {
           getAppointments: () => JSON.parse(localStorage.getItem(APPOINTMENTS_KEY) || '[]'),
           saveAppointments: (value) => localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(value)),
@@ -1005,7 +1006,7 @@
         }
 
         function isLoggedIn() {
-          return sessionStorage.getItem('kurowska_admin_logged') === 'true';
+          return sessionStorage.getItem('kurowska_admin_logged') === 'true' && Boolean(sessionStorage.getItem('kurowska_admin_token'));
         }
 
         function renderServiceEditor() {
@@ -1137,12 +1138,27 @@
           }
         }
 
-        function login() {
+        async function login() {
           const user = document.getElementById('loginUser').value.trim();
           const pass = document.getElementById('loginPassword').value.trim();
 
-          if (user === ADMIN_LOGIN && pass === ADMIN_PASSWORD) {
+          try {
+            const response = await fetch('/api/admin/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+              },
+              body: JSON.stringify({ username: user, password: pass })
+            });
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || !result.ok) {
+              throw new Error(result.error || 'Błąd logowania');
+            }
+
             sessionStorage.setItem('kurowska_admin_logged', 'true');
+            sessionStorage.setItem('kurowska_admin_token', result.token || '');
             loginBox.style.display = 'none';
             adminArea.classList.add('visible');
             logoutBtn.style.display = 'inline-block';
@@ -1152,13 +1168,33 @@
             renderHolidayEditor();
             renderAppointments();
             renderReviews();
-          } else {
+            loginError.classList.remove('visible');
+          } catch (error) {
+            sessionStorage.removeItem('kurowska_admin_logged');
+            sessionStorage.removeItem('kurowska_admin_token');
+            loginError.textContent = 'Niepoprawny login lub hasło.';
             loginError.classList.add('visible');
           }
         }
 
-        function logout() {
+        async function logout() {
+          const token = sessionStorage.getItem('kurowska_admin_token');
+          if (token) {
+            try {
+              await fetch('/api/admin/logout', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-admin-token': token
+                }
+              });
+            } catch (error) {
+              // Ignorujemy błąd wylogowania i czyścimy sesję lokalnie.
+            }
+          }
+
           sessionStorage.removeItem('kurowska_admin_logged');
+          sessionStorage.removeItem('kurowska_admin_token');
           loginBox.style.display = 'block';
           adminArea.classList.remove('visible');
           logoutBtn.style.display = 'none';

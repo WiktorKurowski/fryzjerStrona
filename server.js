@@ -1,11 +1,29 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'store.json');
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'kurowska_admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Kurowska!Fryzjer2026#Admin';
+const adminSessions = new Map();
+
+function generateSessionToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function requireAdmin(req, res, next) {
+  const token = req.headers['x-admin-token'] || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+
+  if (!token || !adminSessions.has(token)) {
+    return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  }
+
+  return next();
+}
 
 function ensureStore() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -51,12 +69,39 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+app.post('/api/admin/login', (req, res) => {
+  const username = String(req.body && req.body.username ? req.body.username : '').trim();
+  const password = String(req.body && req.body.password ? req.body.password : '').trim();
+
+  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ ok: false, error: 'Nieprawidłowe dane logowania.' });
+  }
+
+  const token = generateSessionToken();
+  adminSessions.set(token, { username, createdAt: Date.now() });
+
+  return res.json({ ok: true, token, user: username });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  const token = req.headers['x-admin-token'] || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (token) {
+    adminSessions.delete(token);
+  }
+  return res.json({ ok: true });
+});
+
+app.get('/api/admin/session', (req, res) => {
+  const token = req.headers['x-admin-token'] || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  return res.json({ ok: Boolean(token && adminSessions.has(token)) });
+});
+
 app.get('/api/services', (req, res) => {
   const store = readStore();
   res.json(store.services || []);
 });
 
-app.post('/api/services', (req, res) => {
+app.post('/api/services', requireAdmin, (req, res) => {
   const store = readStore();
   store.services = Array.isArray(req.body) ? req.body : [];
   writeStore(store);
@@ -68,7 +113,7 @@ app.get('/api/hours', (req, res) => {
   res.json(store.hours || []);
 });
 
-app.post('/api/hours', (req, res) => {
+app.post('/api/hours', requireAdmin, (req, res) => {
   const store = readStore();
   store.hours = Array.isArray(req.body) ? req.body : [];
   writeStore(store);
@@ -80,7 +125,7 @@ app.get('/api/holiday', (req, res) => {
   res.json(store.holiday || { active: false, from: '', until: '', message: 'Jestem na wakacjach. Wracam do pracy {date}.' });
 });
 
-app.post('/api/holiday', (req, res) => {
+app.post('/api/holiday', requireAdmin, (req, res) => {
   const store = readStore();
   store.holiday = {
     active: Boolean(req.body && req.body.active),
@@ -97,7 +142,7 @@ app.get('/api/appointments', (req, res) => {
   res.json(store.appointments || []);
 });
 
-app.post('/api/appointments', (req, res) => {
+app.post('/api/appointments', requireAdmin, (req, res) => {
   const store = readStore();
   const next = Array.isArray(req.body) ? req.body : [req.body];
   store.appointments = next.filter(Boolean);
@@ -105,7 +150,7 @@ app.post('/api/appointments', (req, res) => {
   res.json(store.appointments);
 });
 
-app.put('/api/appointments/:id', (req, res) => {
+app.put('/api/appointments/:id', requireAdmin, (req, res) => {
   const store = readStore();
   const id = req.params.id;
   store.appointments = (store.appointments || []).map((appointment) => {
@@ -116,7 +161,7 @@ app.put('/api/appointments/:id', (req, res) => {
   res.json(store.appointments);
 });
 
-app.delete('/api/appointments/:id', (req, res) => {
+app.delete('/api/appointments/:id', requireAdmin, (req, res) => {
   const store = readStore();
   const id = req.params.id;
   store.appointments = (store.appointments || []).filter((appointment) => {
