@@ -171,17 +171,27 @@
       }
 
       .review-table-wrap {
-        max-height: 420px;
+        height: 420px;
         overflow-y: auto;
+        overflow-x: auto;
         margin-top: 22px;
         border: 1px solid var(--line);
         border-radius: 16px;
         background: #fff;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(141, 107, 46, 0.5) rgba(255,255,255,0.08);
       }
 
       .review-table {
         width: 100%;
         border-collapse: collapse;
+      }
+
+      .review-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #fffaf7;
       }
 
       .review-table th,
